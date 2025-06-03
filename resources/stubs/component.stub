@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace {{ $namespace }};
 
-use ModusDigital\LivewireDatatables\Table;
-use ModusDigital\LivewireDatatables\Column;
+use ModusDigital\LivewireDatatables\Livewire\Table;
+use ModusDigital\LivewireDatatables\Columns\Column;
 
 
 class {{ $name }} extends Table
