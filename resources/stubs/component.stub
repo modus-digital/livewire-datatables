@@ -1,0 +1,58 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ $namespace }};
+
+use ModusDigital\LivewireDatatables\Livewire\Table;
+use ModusDigital\LivewireDatatables\Columns\Column;
+
+
+class {{ $name }} extends Table
+{
+    /**
+     * The model used for the table.
+     */
+    protected string $model = {{ $model }}::class;
+
+    protected function columns(): array
+    {
+        return [
+            // Column::make('...'),
+        ];
+    }
+
+    protected function filters(): array
+    {
+        return [
+            // ...
+        ];
+    }
+
+
+    /**
+     * This are the actions that will be shown
+     * in the header of the table.
+     *
+     * @return array
+     */
+    protected function actions(): array
+    {
+        return [
+            // ...
+        ];
+    }
+
+    /**
+     * This are the actions that will be shown
+     * as a row action.
+     *
+     * @return array
+     */
+    protected function rowActions(): array
+    {
+        return [
+            // ...
+        ];
+    }
+}
