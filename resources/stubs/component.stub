@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ $namespace }};
+
+use ModusDigital\LivewireDatatables\Livewire\Table;
+use ModusDigital\LivewireDatatables\Column;
+
+
+class {{ $name }} extends Table
+{
+    /**
+     * The model used for the table.
+     */
+    protected string $model = {{ $model }}::class;
+
+    /**
+     * Define the columns for the table.
+     *
+     * @return array<Column>
+     */
+    protected function columns(): array
+    {
+        return [
+            // ...
+        ];
+    }
+
+    /**
+     * Define the filters for the table.
+     *
+     * @return array<BaseFilter>
+     */
+    protected function filters(): array
+    {
+        return [
+            // ...
+        ];
+    }
+
+    /**
+     * Define the actions for the table.
+     *
+     * @return array<BaseAction>
+     */
+    protected function actions(): array
+    {
+        return [
+            // ...
+        ];
+    }
+}

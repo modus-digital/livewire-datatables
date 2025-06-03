@@ -1,79 +1,291 @@
-# :package_description
+# Livewire Datatables
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/:vendor_slug/:package_slug/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/:vendor_slug/:package_slug/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/:vendor_slug/:package_slug/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/:vendor_slug/:package_slug/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-<!--delete-->
----
-This repo can be used to scaffold a Laravel package. Follow these steps to get started:
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/modus-digital/livewire-datatables.svg?style=flat-square)](https://packagist.org/packages/modus-digital/livewire-datatables)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/modus-digital/livewire-datatables/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/modus-digital/livewire-datatables/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/modus-digital/livewire-datatables/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/modus-digital/livewire-datatables/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/modus-digital/livewire-datatables.svg?style=flat-square)](https://packagist.org/packages/modus-digital/livewire-datatables)
 
-1. Press the "Use this template" button at the top of this repo to create a new repo with the contents of this skeleton.
-2. Run "php ./configure.php" to run a script that will replace all placeholders throughout all the files.
-3. Have fun creating your package.
-4. If you need help creating a package, consider picking up our <a href="https://laravelpackage.training">Laravel Package Training</a> video course.
----
-<!--/delete-->
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+A reusable, highly-customizable **Livewire Datatable** component for the TALL stack (Tailwind CSS, Alpine.js, Laravel, Livewire). Built with modularity, testability, and developer experience in mind.
 
-## Support us
+## Features
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/:package_name.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/:package_name)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+- 🎨 **Beautiful Tailwind CSS styling** with dark mode support
+- 🔍 **Global search** with debounced input (300ms)
+- 🗂️ **Advanced filtering** with multiple filter types
+- 📊 **Column sorting** with visual indicators
+- 📄 **Pagination** with customizable page sizes
+- ✅ **Row selection** with bulk actions
+- 🔧 **Highly customizable** with traits and concerns
+- 🧪 **Fully tested** with Pest 3
+- 📱 **Responsive design** for all screen sizes
+- ♿ **Accessibility features** built-in
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require :vendor_slug/:package_slug
+composer require modus-digital/livewire-datatables
 ```
 
-You can publish and run the migrations with:
+Optionally, you can publish the views using:
 
 ```bash
-php artisan vendor:publish --tag=":package_slug-migrations"
-php artisan migrate
+php artisan vendor:publish --tag="livewire-datatables-views"
 ```
 
-You can publish the config file with:
+## Quick Start
 
-```bash
-php artisan vendor:publish --tag=":package_slug-config"
-```
-
-This is the contents of the published config file:
+### 1. Create a Table Component
 
 ```php
-return [
-];
+<?php
+
+use App\Models\User;
+use ModusDigital\LivewireDatatables\Table;
+use ModusDigital\LivewireDatatables\Columns\Column;
+use ModusDigital\LivewireDatatables\Filters\SelectFilter;
+
+class UsersTable extends Table
+{
+    protected string $model = User::class;
+
+    protected function columns(): array
+    {
+        return [
+            Column::make('Name')
+                ->field('name')
+                ->sortable()
+                ->searchable(),
+
+            Column::make('Email')
+                ->field('email')
+                ->sortable()
+                ->searchable(),
+
+            Column::make('Role')
+                ->relationship('profile', 'role')
+                ->sortable(),
+
+            Column::make('Status')
+                ->field('status')
+                ->format(fn($value) => ucfirst($value)),
+        ];
+    }
+
+    protected function filters(): array
+    {
+        return [
+            SelectFilter::make('Status')->options([
+                'active' => 'Active',
+                'inactive' => 'Inactive',
+                'banned' => 'Banned',
+            ]),
+        ];
+    }
+}
 ```
 
-Optionally, you can publish the views using
+### 2. Use in Your Blade Template
 
-```bash
-php artisan vendor:publish --tag=":package_slug-views"
+```blade
+<div>
+    <livewire:users-table />
+</div>
 ```
 
-## Usage
+## Advanced Usage
+
+### Column Configuration
 
 ```php
-$variable = new VendorName\Skeleton();
-echo $variable->echoPhrase('Hello, VendorName!');
+Column::make('Avatar')
+    ->field('avatar_url')
+    ->view('components.avatar') // Custom view
+    ->attributes(['header_class' => 'w-16']),
+
+Column::make('Created')
+    ->field('created_at')
+    ->sortable()
+    ->format(fn($value) => $value->diffForHumans()),
+
+Column::make('Actions')
+    ->view('components.user-actions')
+    ->attributes(['cell_class' => 'text-right']),
+```
+
+### Row Selection & Bulk Actions
+
+```php
+class UsersTable extends Table
+{
+    public bool $enableRowSelection = true;
+
+    protected function bulkActions(): array
+    {
+        return [
+            [
+                'name' => 'Delete Selected',
+                'key' => 'delete',
+                'class' => 'bg-red-600 hover:bg-red-700',
+            ],
+            [
+                'name' => 'Export Selected',
+                'key' => 'export',
+                'class' => 'bg-green-600 hover:bg-green-700',
+            ],
+        ];
+    }
+
+    public function bulkActionDelete($rows)
+    {
+        $rows->each->delete();
+        session()->flash('message', 'Selected users deleted successfully.');
+    }
+
+    public function bulkActionExport($rows)
+    {
+        // Export logic here
+    }
+}
+```
+
+### Row Actions
+
+```php
+protected function rowActions(): array
+{
+    return [
+        [
+            'name' => 'Edit',
+            'key' => 'edit',
+            'icon' => '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>',
+        ],
+        [
+            'name' => 'Delete',
+            'key' => 'delete',
+            'class' => 'text-red-600 hover:text-red-900',
+        ],
+    ];
+}
+
+public function rowActionEdit($row)
+{
+    return redirect()->route('users.edit', $row);
+}
+
+public function rowActionDelete($row)
+{
+    $row->delete();
+    session()->flash('message', 'User deleted successfully.');
+}
+```
+
+### Global Actions
+
+```php
+protected function globalActions(): array
+{
+    return [
+        [
+            'name' => 'Add User',
+            'key' => 'create',
+            'label' => '+ Add User',
+            'class' => 'bg-orange-600 hover:bg-orange-700',
+        ],
+    ];
+}
+
+public function globalAction($action)
+{
+    if ($action === 'create') {
+        return redirect()->route('users.create');
+    }
+}
+```
+
+### Custom Empty State
+
+```php
+public string $emptyStateTitle = 'No users found';
+public string $emptyStateDescription = 'Get started by creating your first user.';
+```
+
+### Pagination Configuration
+
+```php
+public int $perPage = 25;
+public array $perPageOptions = [10, 25, 50, 100];
+public bool $showPerPageSelector = true;
+```
+
+## Customization
+
+### Publishing Views
+
+To customize the table appearance, publish the views:
+
+```bash
+php artisan vendor:publish --tag="livewire-datatables-views"
+```
+
+This will publish all Blade templates to `resources/views/vendor/livewire-datatables/`.
+
+### Styling
+
+The package uses Tailwind CSS classes exclusively. You can:
+
+1. **Override CSS classes** by modifying the published views
+2. **Add custom attributes** to columns using the `attributes()` method
+3. **Use custom views** for specific columns with the `view()` method
+
+### Dark Mode
+
+Dark mode is supported out of the box using Tailwind's `dark:` variants. Ensure your project has dark mode configured in `tailwind.config.js`:
+
+```js
+module.exports = {
+    darkMode: 'class', // or 'media'
+    // ... rest of config
+}
 ```
 
 ## Testing
+
+The package includes comprehensive tests using Pest 3:
 
 ```bash
 composer test
 ```
 
-## Changelog
+All traits are individually tested with feature tests covering:
+- Column functionality
+- Filtering and search
+- Sorting mechanisms
+- Pagination
+- Row selection
+- Bulk actions
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+## Architecture
+
+The package follows a modular architecture using traits:
+
+- **`HasColumns`** - Column management and rendering
+- **`HasFilters`** - Filter functionality
+- **`HasPagination`** - Pagination configuration
+- **`HasSorting`** - Sorting logic
+- **`HasRowSelection`** - Row selection and bulk actions
+- **`HasRowActions`** - Individual row actions
+
+Each trait is under 150 lines of code and fully unit tested.
+
+## Requirements
+
+- PHP 8.3+
+- Laravel 10.0+ | 11.0+ | 12.0+
+- Livewire 3.0+
+- Tailwind CSS 3.0+
+- Alpine.js 3.0+
 
 ## Contributing
 
@@ -85,7 +297,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [:author_name](https://github.com/:author_username)
+- [Alex van Steenhoven](https://github.com/modus-digital)
 - [All Contributors](../../contributors)
 
 ## License
