@@ -9,8 +9,11 @@ use Illuminate\Database\Eloquent\Builder;
 abstract class Filter
 {
     protected string $name;
+
     protected string $field;
+
     protected mixed $default = null;
+
     protected ?string $placeholder = null;
 
     public function __construct(string $name)
@@ -27,18 +30,21 @@ abstract class Filter
     public function field(string $field): static
     {
         $this->field = $field;
+
         return $this;
     }
 
     public function default(mixed $default): static
     {
         $this->default = $default;
+
         return $this;
     }
 
     public function placeholder(string $placeholder): static
     {
         $this->placeholder = $placeholder;
+
         return $this;
     }
 

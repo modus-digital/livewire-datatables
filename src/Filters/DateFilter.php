@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace ModusDigital\LivewireDatatables\Filters;
 
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class DateFilter extends Filter
 {
     protected bool $range = false;
+
     protected string $format = 'Y-m-d';
 
     public function range(bool $range = true): self
     {
         $this->range = $range;
+
         return $this;
     }
 
     public function format(string $format): self
     {
         $this->format = $format;
+
         return $this;
     }
 
@@ -36,12 +39,13 @@ class DateFilter extends Filter
         }
 
         if ($this->range && is_array($value)) {
-            if (!empty($value['from'])) {
+            if (! empty($value['from'])) {
                 $query->where($this->field, '>=', Carbon::parse($value['from'])->startOfDay());
             }
-            if (!empty($value['to'])) {
+            if (! empty($value['to'])) {
                 $query->where($this->field, '<=', Carbon::parse($value['to'])->endOfDay());
             }
+
             return $query;
         }
 

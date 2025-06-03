@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ModusDigital\LivewireDatatables\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 

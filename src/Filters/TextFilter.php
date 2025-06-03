@@ -13,24 +13,28 @@ class TextFilter extends Filter
     public function exact(): self
     {
         $this->operator = '=';
+
         return $this;
     }
 
     public function contains(): self
     {
         $this->operator = 'like';
+
         return $this;
     }
 
     public function startsWith(): self
     {
         $this->operator = 'starts_with';
+
         return $this;
     }
 
     public function endsWith(): self
     {
         $this->operator = 'ends_with';
+
         return $this;
     }
 

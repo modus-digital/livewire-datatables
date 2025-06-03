@@ -7,7 +7,9 @@ namespace ModusDigital\LivewireDatatables\Concerns;
 trait HasRowSelection
 {
     public array $selected = [];
+
     public bool $selectAll = false;
+
     public bool $showSelection = true;
 
     /**
@@ -78,7 +80,7 @@ trait HasRowSelection
      */
     public function hasSelected(): bool
     {
-        return !empty($this->selected);
+        return ! empty($this->selected);
     }
 
     /**
@@ -95,6 +97,7 @@ trait HasRowSelection
     public function disableSelection(): static
     {
         $this->showSelection = false;
+
         return $this;
     }
 
@@ -104,6 +107,7 @@ trait HasRowSelection
     public function enableSelection(): static
     {
         $this->showSelection = true;
+
         return $this;
     }
 
@@ -121,7 +125,7 @@ trait HasRowSelection
     protected function updateSelectAllState(): void
     {
         $visibleIds = $this->getVisibleRowIds();
-        $this->selectAll = !empty($visibleIds) && count(array_intersect($this->selected, $visibleIds)) === count($visibleIds);
+        $this->selectAll = ! empty($visibleIds) && count(array_intersect($this->selected, $visibleIds)) === count($visibleIds);
     }
 
     /**

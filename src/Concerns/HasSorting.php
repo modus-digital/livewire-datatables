@@ -30,7 +30,7 @@ trait HasSorting
      */
     public function sortBy(string $field): void
     {
-        if (!$this->isColumnSortable($field)) {
+        if (! $this->isColumnSortable($field)) {
             return;
         }
 

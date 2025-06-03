@@ -6,10 +6,11 @@ namespace ModusDigital\LivewireDatatables;
 
 // Laravel
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\{Builder, Model};
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Livewire\{Component, Attributes\Url};
-
+use Livewire\Attributes\Url;
+use Livewire\Component;
 // Concerns
 use ModusDigital\LivewireDatatables\Concerns\HasColumns;
 use ModusDigital\LivewireDatatables\Concerns\HasFilters;
@@ -69,7 +70,7 @@ abstract class Table extends Component
         $query = $this->query();
 
         // Apply global search
-        if ($this->searchable && !empty($this->search)) {
+        if ($this->searchable && ! empty($this->search)) {
             $query = $this->applyGlobalSearch($query);
         }
 

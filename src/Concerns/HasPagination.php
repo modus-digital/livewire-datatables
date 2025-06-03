@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ModusDigital\LivewireDatatables\Concerns;
 
-use Livewire\WithPagination;
 use Livewire\Attributes\Url;
+use Livewire\WithPagination;
 
 trait HasPagination
 {

@@ -49,7 +49,7 @@ trait HasRowActions
         $actions = $this->getRowActions();
         $actionConfig = $actions->firstWhere('key', $action);
 
-        if (!$actionConfig) {
+        if (! $actionConfig) {
             return;
         }
 
@@ -84,6 +84,7 @@ trait HasRowActions
     protected function actionCallback(array $action, Closure $callback): array
     {
         $action['callback'] = $callback;
+
         return $action;
     }
 
@@ -93,6 +94,7 @@ trait HasRowActions
     protected function actionIcon(array $action, string $icon): array
     {
         $action['icon'] = $icon;
+
         return $action;
     }
 
@@ -102,6 +104,7 @@ trait HasRowActions
     protected function actionClass(array $action, string $class): array
     {
         $action['class'] = $class;
+
         return $action;
     }
 
@@ -111,6 +114,7 @@ trait HasRowActions
     protected function actionConfirm(array $action, string $message): array
     {
         $action['confirmMessage'] = $message;
+
         return $action;
     }
 
@@ -120,6 +124,7 @@ trait HasRowActions
     protected function actionVisible(array $action, bool|Closure $condition): array
     {
         $action['visible'] = $condition;
+
         return $action;
     }
 
@@ -142,6 +147,6 @@ trait HasRowActions
      */
     public function getRecordActions(mixed $record): Collection
     {
-        return $this->getRowActions()->filter(fn($action) => $this->isActionVisible($action, $record));
+        return $this->getRowActions()->filter(fn ($action) => $this->isActionVisible($action, $record));
     }
 }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ModusDigital\LivewireDatatables\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
-use ModusDigital\LivewireDatatables\Filters\Filter;
-use Livewire\Attributes\Url;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Url;
+use ModusDigital\LivewireDatatables\Filters\Filter;
 
 trait HasFilters
 {
@@ -77,7 +77,7 @@ trait HasFilters
      */
     public function hasActiveFilters(): bool
     {
-        return !empty(array_filter($this->filters, fn($value) => $value !== null && $value !== '' && $value !== []));
+        return ! empty(array_filter($this->filters, fn ($value) => $value !== null && $value !== '' && $value !== []));
     }
 
     /**
@@ -85,7 +85,7 @@ trait HasFilters
      */
     public function getActiveFilterCount(): int
     {
-        return count(array_filter($this->filters, fn($value) => $value !== null && $value !== '' && $value !== []));
+        return count(array_filter($this->filters, fn ($value) => $value !== null && $value !== '' && $value !== []));
     }
 
     /**
@@ -95,7 +95,7 @@ trait HasFilters
     {
         foreach ($this->getFilters() as $filter) {
             $field = $filter->getField();
-            if (!isset($this->filters[$field]) && $filter->getDefault() !== null) {
+            if (! isset($this->filters[$field]) && $filter->getDefault() !== null) {
                 $this->filters[$field] = $filter->getDefault();
             }
         }

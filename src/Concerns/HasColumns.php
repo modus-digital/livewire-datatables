@@ -30,7 +30,7 @@ trait HasColumns
             $this->columnCache = $this->columns();
         }
 
-        return collect($this->columnCache)->filter(fn(Column $column) => !$column->isHidden());
+        return collect($this->columnCache)->filter(fn (Column $column) => ! $column->isHidden());
     }
 
     /**
@@ -38,7 +38,7 @@ trait HasColumns
      */
     public function getSearchableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn(Column $column) => $column->isSearchable());
+        return $this->getColumns()->filter(fn (Column $column) => $column->isSearchable());
     }
 
     /**
@@ -46,7 +46,7 @@ trait HasColumns
      */
     public function getSortableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn(Column $column) => $column->isSortable());
+        return $this->getColumns()->filter(fn (Column $column) => $column->isSortable());
     }
 
     /**
@@ -54,7 +54,7 @@ trait HasColumns
      */
     public function getColumn(string $field): ?Column
     {
-        return $this->getColumns()->first(fn(Column $column) => $column->getField() === $field);
+        return $this->getColumns()->first(fn (Column $column) => $column->getField() === $field);
     }
 
     /**
@@ -63,6 +63,7 @@ trait HasColumns
     public function isColumnSortable(string $field): bool
     {
         $column = $this->getColumn($field);
+
         return $column && $column->isSortable();
     }
 
@@ -72,6 +73,7 @@ trait HasColumns
     public function getColumnSortField(string $field): string
     {
         $column = $this->getColumn($field);
+
         return $column ? $column->getSortField() : $field;
     }
 

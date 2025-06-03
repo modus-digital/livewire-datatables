@@ -9,13 +9,21 @@ use Closure;
 class Column
 {
     protected string $name;
+
     protected ?string $field = null;
+
     protected ?string $relationship = null;
+
     protected bool $sortable = false;
+
     protected bool $searchable = false;
+
     protected ?Closure $formatCallback = null;
+
     protected bool $hidden = false;
+
     protected ?string $width = null;
+
     protected ?string $align = null;
 
     public function __construct(string $name)
@@ -32,48 +40,56 @@ class Column
     public function field(string $field): self
     {
         $this->field = $field;
+
         return $this;
     }
 
     public function relationship(string $relationship): self
     {
         $this->relationship = $relationship;
+
         return $this;
     }
 
     public function sortable(bool $sortable = true): self
     {
         $this->sortable = $sortable;
+
         return $this;
     }
 
     public function searchable(bool $searchable = true): self
     {
         $this->searchable = $searchable;
+
         return $this;
     }
 
     public function format(Closure $callback): self
     {
         $this->formatCallback = $callback;
+
         return $this;
     }
 
     public function hidden(bool $hidden = true): self
     {
         $this->hidden = $hidden;
+
         return $this;
     }
 
     public function width(string $width): self
     {
         $this->width = $width;
+
         return $this;
     }
 
     public function align(string $align): self
     {
         $this->align = $align;
+
         return $this;
     }
 
