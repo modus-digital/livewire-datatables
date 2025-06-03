@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ModusDigital\LivewireDatatables;
+namespace ModusDigital\LivewireDatatables\Livewire;
 
-// Laravel
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
-// Concerns
 use ModusDigital\LivewireDatatables\Concerns\HasColumns;
 use ModusDigital\LivewireDatatables\Concerns\HasFilters;
 use ModusDigital\LivewireDatatables\Concerns\HasPagination;
@@ -163,7 +161,7 @@ abstract class Table extends Component
      */
     public function render()
     {
-        return view('livewire-datatables::table', [
+        return view('livewire-datatables::livewire.table', [
             'rows' => $this->getRows(),
         ]);
     }

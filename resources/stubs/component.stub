@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace {{ $namespace }};
 
-use ModusDigital\LivewireDatatables\Livewire\Table;
+use ModusDigital\LivewireDatatables\Table;
 use ModusDigital\LivewireDatatables\Column;
 
 
@@ -15,23 +15,13 @@ class {{ $name }} extends Table
      */
     protected string $model = {{ $model }}::class;
 
-    /**
-     * Define the columns for the table.
-     *
-     * @return array<Column>
-     */
     protected function columns(): array
     {
         return [
-            // ...
+            // Column::make('...'),
         ];
     }
 
-    /**
-     * Define the filters for the table.
-     *
-     * @return array<BaseFilter>
-     */
     protected function filters(): array
     {
         return [
@@ -39,12 +29,27 @@ class {{ $name }} extends Table
         ];
     }
 
+
     /**
-     * Define the actions for the table.
+     * This are the actions that will be shown
+     * in the header of the table.
      *
-     * @return array<BaseAction>
+     * @return array
      */
     protected function actions(): array
+    {
+        return [
+            // ...
+        ];
+    }
+
+    /**
+     * This are the actions that will be shown
+     * as a row action.
+     *
+     * @return array
+     */
+    protected function rowActions(): array
     {
         return [
             // ...

@@ -66,53 +66,137 @@
                         </button>
                     @endif
 
-                    {{-- Pagination Elements --}}
+                    {{-- Smart Pagination Elements --}}
                     @php
                         $currentPage = $rows->currentPage();
                         $lastPage = $rows->lastPage();
-                        $delta = 2; // Number of pages to show before and after current page
-
-                        $range = [];
-                        $rangeWithDots = [];
-                        $l = 0;
-
-                        for ($i = 1; $i <= $lastPage; $i++) {
-                            if ($i == 1 || $i == $lastPage || ($i >= $currentPage - $delta && $i <= $currentPage + $delta)) {
-                                $range[] = $i;
-                            }
-                        }
-
-                        foreach ($range as $i) {
-                            if ($l) {
-                                if ($i - $l === 2) {
-                                    $rangeWithDots[] = $l + 1;
-                                } elseif ($i - $l !== 1) {
-                                    $rangeWithDots[] = '...';
-                                }
-                            }
-                            $rangeWithDots[] = $i;
-                            $l = $i;
-                        }
+                        $maxVisible = 6;
                     @endphp
 
-                    @foreach($rangeWithDots as $page)
-                        @if($page === '...')
+                    @if($lastPage <= $maxVisible)
+                        {{-- Show all pages if total pages <= 6 --}}
+                        @for($page = 1; $page <= $lastPage; $page++)
+                            @if($page == $currentPage)
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-200">
+                                    {{ $page }}
+                                </span>
+                            @else
+                                <button
+                                    wire:click="gotoPage({{ $page }})"
+                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                >
+                                    {{ $page }}
+                                </button>
+                            @endif
+                        @endfor
+                    @else
+                        {{-- Smart pagination with ellipses --}}
+                        @if($currentPage <= 4)
+                            {{-- Current page is near the beginning --}}
+                            @for($page = 1; $page <= 5; $page++)
+                                @if($page == $currentPage)
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-200">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <button
+                                        wire:click="gotoPage({{ $page }})"
+                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                    >
+                                        {{ $page }}
+                                    </button>
+                                @endif
+                            @endfor
+
+                            {{-- Ellipsis --}}
                             <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">
                                 ...
                             </span>
-                        @elseif($page == $rows->currentPage())
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-200">
-                                {{ $page }}
-                            </span>
-                        @else
+
+                            {{-- Last page --}}
                             <button
-                                wire:click="gotoPage({{ $page }})"
-                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                wire:click="gotoPage({{ $lastPage }})"
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                             >
-                                {{ $page }}
+                                {{ $lastPage }}
+                            </button>
+
+                        @elseif($currentPage >= $lastPage - 3)
+                            {{-- Current page is near the end --}}
+                            {{-- First page --}}
+                            <button
+                                wire:click="gotoPage(1)"
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                            >
+                                1
+                            </button>
+
+                            {{-- Ellipsis --}}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">
+                                ...
+                            </span>
+
+                            {{-- Last 5 pages --}}
+                            @for($page = $lastPage - 4; $page <= $lastPage; $page++)
+                                @if($page == $currentPage)
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-200">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <button
+                                        wire:click="gotoPage({{ $page }})"
+                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                    >
+                                        {{ $page }}
+                                    </button>
+                                @endif
+                            @endfor
+
+                        @else
+                            {{-- Current page is in the middle --}}
+                            {{-- First page --}}
+                            <button
+                                wire:click="gotoPage(1)"
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                            >
+                                1
+                            </button>
+
+                            {{-- First ellipsis --}}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">
+                                ...
+                            </span>
+
+                            {{-- Current page and surrounding pages --}}
+                            @for($page = $currentPage - 1; $page <= $currentPage + 1; $page++)
+                                @if($page == $currentPage)
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600 dark:bg-indigo-900 dark:border-indigo-700 dark:text-indigo-200">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <button
+                                        wire:click="gotoPage({{ $page }})"
+                                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                    >
+                                        {{ $page }}
+                                    </button>
+                                @endif
+                            @endfor
+
+                            {{-- Second ellipsis --}}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">
+                                ...
+                            </span>
+
+                            {{-- Last page --}}
+                            <button
+                                wire:click="gotoPage({{ $lastPage }})"
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                            >
+                                {{ $lastPage }}
                             </button>
                         @endif
-                    @endforeach
+                    @endif
 
                     {{-- Next Page Link --}}
                     @if($rows->hasMorePages())

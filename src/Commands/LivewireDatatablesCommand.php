@@ -13,7 +13,7 @@ class LivewireDatatablesCommand extends Command
     /** @var string */
     protected $signature = 'make:table
         {name? : The table class to generate (e.g. UsersTable or Dashboard/UsersTable)}
-        {model? : The model class to use (e.g. App\Models\User)}';
+        {--model=\App\Models\User : The model class to use (e.g. App\Models\User)}';
 
     /** @var string */
     protected $description = 'Generate a new Livewire table component class';
@@ -21,7 +21,7 @@ class LivewireDatatablesCommand extends Command
     public function handle(Filesystem $files): int
     {
         $name = $this->argument('name') ?: $this->ask('Table class name (e.g. UsersTable)');
-        $model = $this->argument('model') ?: $this->ask('Model class name (e.g. App\\Models\\User)');
+        $model = $this->option('model') ?: $this->ask('Model class name (e.g. App\\Models\\User)');
 
         if (empty($name)) {
             $this->error('Table class name is required');
@@ -58,7 +58,10 @@ class LivewireDatatablesCommand extends Command
         }
 
         $namespaceSuffix = $segments ? '\\' . implode('\\', array_map([Str::class, 'studly'], $segments)) : '';
-        $namespace = 'App\\Livewire\\Tables' . $namespaceSuffix;
+
+        $namespace = Str::contains($namespaceSuffix, 'Tables')
+            ? 'App\\Livewire\\Tables' . $namespaceSuffix
+            : 'App\\Livewire' . $namespaceSuffix;
 
         $stub = $files->get(__DIR__ . '/../../resources/stubs/component.stub');
 

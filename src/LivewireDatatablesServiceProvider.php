@@ -22,17 +22,4 @@ class LivewireDatatablesServiceProvider extends PackageServiceProvider
             ->hasViews()
             ->hasCommand(LivewireDatatablesCommand::class);
     }
-
-    public function packageBooted(): void
-    {
-        // Load the views
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'livewire-datatables');
-
-        // Publish views
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../resources/views' => resource_path('views/vendor/livewire-datatables'),
-            ], 'livewire-datatables-views');
-        }
-    }
 }

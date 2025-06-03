@@ -1,42 +1,30 @@
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg w-full">
-
-    {{-- Start of Header --}}
     @include('livewire-datatables::partials.header')
 
-    <div class="my-2 border-b border-gray-200 dark:border-gray-700"></div>
-    {{-- End of Header --}}
+    @if($this->isSearchable() || !empty($actions))
+        <div class="border-b border-gray-200 dark:border-gray-700 mx-4"></div>
+    @endif
 
-    {{-- Start of Table content --}}
-    <div class="overflow-x-auto">
-        {{-- Start of filters --}}
-        <div>
-            @include('livewire-datatables::partials.filters')
-        </div>
-        {{-- End of filters --}}
-
-        <div>
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                {{-- Table Head --}}
-                @include('livewire-datatables::partials.table-head')
-
-                {{-- Table Body --}}
-                @include('livewire-datatables::partials.table-body')
-            </table>
-        </div>
+    <div class="px-6 py-4 mb-4 overflow-x-auto">
+        @include('livewire-datatables::partials.filters')
     </div>
-    {{-- End of Table content --}}
 
-    {{-- Start of Empty State and Pagination --}}
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        @include('livewire-datatables::partials.table-head')
+
+        @include('livewire-datatables::partials.table-body')
+    </table>
+
     @if($rows->isEmpty())
         @include('livewire-datatables::partials.empty-state')
     @endif
 
-    {{-- Pagination --}}
     @if($rows->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-            @include('livewire-datatables::partials.pagination')
-        </div>
+        @include('livewire-datatables::partials.pagination')
     @endif
-    {{-- End of Empty State and Pagination --}}
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 
 </div>

@@ -1,27 +1,28 @@
-<thead class="bg-gray-50 dark:bg-gray-900">
+<thead class="bg-gray-50 dark:bg-gray-800 mx-4">
     <tr>
-        {{-- Selection Checkbox --}}
-        @if($this->hasSelection())
+        @if ($this->hasSelection())
             <th scope="col" class="relative px-6 py-3 text-left">
                 <input
                     type="checkbox"
                     wire:model.live="selectAll"
                     wire:click="toggleSelectAll"
-                    class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
             </th>
         @endif
 
-        {{-- Column Headers --}}
+        {{-- Column headers --}}
         @foreach($this->getColumns() as $column)
             <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400
-                       @if($column->isSortable()) cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 @endif"
+                @class([
+                    'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800' => $column->isSortable(),
+                    'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400'
+                ])
                 @if($column->isSortable()) wire:click="sortBy('{{ $column->getField() }}')" @endif
                 @if($column->getWidth()) style="width: {{ $column->getWidth() }}" @endif
             >
-                <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
                     <span class="@if($column->getAlign()) text-{{ $column->getAlign() }} @endif">
                         {{ $column->getName() }}
                     </span>
@@ -49,9 +50,8 @@
             </th>
         @endforeach
 
-        {{-- Row Actions Column --}}
         @if($this->hasRowActions())
-            <th scope="col" class="relative px-6 py-3">
+            <th scope="col" class="relative px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-6">
                 <span class="sr-only">Actions</span>
             </th>
         @endif
