@@ -161,7 +161,7 @@ abstract class Table extends Component
      */
     public function render()
     {
-        return view('livewire-datatables::livewire.table', [
+        return view('livewire-datatables::table', [
             'rows' => $this->getRows(),
         ]);
     }

@@ -1,5 +1,6 @@
 <div class="flex items-center justify-between gap-4 space-y-4">
     <div class="flex items-center gap-2">
+        
         @if($this->isSearchable())
             <input
                 type="text"
