@@ -3,7 +3,8 @@
 use ModusDigital\LivewireDatatables\Concerns\HasPagination;
 
 it('uses datatable pagination views', function () {
-    $table = new class {
+    $table = new class
+    {
         use HasPagination;
     };
 
