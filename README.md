@@ -57,6 +57,7 @@ php artisan vendor:publish --tag="livewire-datatables-views"
 use App\Models\User;
 use ModusDigital\LivewireDatatables\Table;
 use ModusDigital\LivewireDatatables\Columns\Column;
+use ModusDigital\LivewireDatatables\Columns\TextColumn;
 use ModusDigital\LivewireDatatables\Filters\SelectFilter;
 
 class UsersTable extends Table
@@ -80,9 +81,10 @@ class UsersTable extends Table
                 ->relationship('profile', 'role')
                 ->sortable(),
 
-            Column::make('Status')
+            TextColumn::make('Status')
                 ->field('status')
-                ->format(fn($value) => ucfirst($value)),
+                ->badge()
+                ->limit(10),
         ];
     }
 
@@ -170,19 +172,13 @@ class UsersTable extends Table
 ### Row Actions
 
 ```php
+use ModusDigital\LivewireDatatables\Actions\RowAction;
+
 protected function rowActions(): array
 {
     return [
-        [
-            'name' => 'Edit',
-            'key' => 'edit',
-            'icon' => '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>',
-        ],
-        [
-            'name' => 'Delete',
-            'key' => 'delete',
-            'class' => 'text-red-600 hover:text-red-900',
-        ],
+        RowAction::make('edit', 'Edit')->icon('<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>'),
+        RowAction::make('delete', 'Delete')->class('text-red-600 hover:text-red-900'),
     ];
 }
 
@@ -201,15 +197,14 @@ public function rowActionDelete($row)
 ### Global Actions
 
 ```php
+use ModusDigital\LivewireDatatables\Actions\Action;
+
 protected function globalActions(): array
 {
     return [
-        [
-            'name' => 'Add User',
-            'key' => 'create',
-            'label' => '+ Add User',
-            'class' => 'bg-orange-600 hover:bg-orange-700',
-        ],
+        Action::make('create', 'Add User')
+            ->class('bg-orange-600 hover:bg-orange-700')
+            ->label('+ Add User'),
     ];
 }
 

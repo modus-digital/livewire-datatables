@@ -39,6 +39,18 @@ class DateFilter extends Filter
         }
 
         if ($this->range && is_array($value)) {
+            if (str_contains($this->field, '.')) {
+                [$relation, $field] = explode('.', $this->field, 2);
+                return $query->whereHas($relation, function (Builder $q) use ($field, $value) {
+                    if (! empty($value['from'])) {
+                        $q->where($field, '>=', Carbon::parse($value['from'])->startOfDay());
+                    }
+                    if (! empty($value['to'])) {
+                        $q->where($field, '<=', Carbon::parse($value['to'])->endOfDay());
+                    }
+                });
+            }
+
             if (! empty($value['from'])) {
                 $query->where($this->field, '>=', Carbon::parse($value['from'])->startOfDay());
             }
@@ -47,6 +59,11 @@ class DateFilter extends Filter
             }
 
             return $query;
+        }
+
+        if (str_contains($this->field, '.')) {
+            [$relation, $field] = explode('.', $this->field, 2);
+            return $query->whereHas($relation, fn (Builder $q) => $q->whereDate($field, Carbon::parse($value)));
         }
 
         return $query->whereDate($this->field, Carbon::parse($value));
