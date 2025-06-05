@@ -20,6 +20,19 @@ A reusable, highly-customizable **Livewire Datatable** component for the TALL st
 - 📱 **Responsive design** for all screen sizes
 - ♿ **Accessibility features** built-in
 
+## Package Overview
+
+This repository is a Laravel package that ships a ready-to-use datatable component built with Livewire. The goal is to provide a clean starting point that you can easily extend.
+
+**Key directories**
+
+- `src/` – The `Table` Livewire component, traits, column definitions and filters.
+- `resources/views/` – Blade templates that render the table.
+- `resources/stubs/` – Stub used by the `make:table` command.
+- `tests/` – Pest tests and architecture rules.
+
+The `Table` class orchestrates querying your model, applying search, filters, sorting and pagination so your table class focuses on describing columns and filters.
+
 ## Installation
 
 You can install the package via composer:
@@ -93,6 +106,10 @@ class UsersTable extends Table
     <livewire:users-table />
 </div>
 ```
+
+## How It Works
+
+The table component builds a query from your model, applies global search, filters and sorting, then paginates the results. Each column can be marked sortable or searchable and may format its value using a callback. Filters implement a simple `apply()` method so you can easily add custom logic. The included Blade views render everything with Tailwind classes.
 
 ## Advanced Usage
 
@@ -278,6 +295,13 @@ The package follows a modular architecture using traits:
 - **`HasRowActions`** - Individual row actions
 
 Each trait is under 150 lines of code and fully unit tested.
+
+## Next Steps
+
+- Browse the traits in `src/Concerns` to understand how each feature works.
+- Customize the Blade templates in `resources/views` to match your design.
+- Use the `make:table` Artisan command to scaffold new tables from the provided stub.
+- Run `composer analyse` and `composer test` to ensure quality as you extend the package.
 
 ## Requirements
 
