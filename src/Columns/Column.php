@@ -32,9 +32,9 @@ class Column
         $this->field = strtolower(str_replace(' ', '_', $name));
     }
 
-    public static function make(string $name): self
+    public static function make(string $name): static
     {
-        return new self($name);
+        return new static($name);
     }
 
     public function field(string $field): self
