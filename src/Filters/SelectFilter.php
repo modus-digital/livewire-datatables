@@ -42,6 +42,18 @@ class SelectFilter extends Filter
             return $query;
         }
 
+        if (str_contains($this->field, '.')) {
+            [$relation, $field] = explode('.', $this->field, 2);
+
+            return $query->whereHas($relation, function (Builder $q) use ($field, $value) {
+                if ($this->multiple && is_array($value)) {
+                    $q->whereIn($field, $value);
+                } else {
+                    $q->where($field, $value);
+                }
+            });
+        }
+
         if ($this->multiple && is_array($value)) {
             return $query->whereIn($this->field, $value);
         }

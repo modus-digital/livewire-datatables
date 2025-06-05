@@ -31,12 +31,20 @@
         @endif
     </div>
 
-    {{-- Global actions slot --}}
     <div class="flex items-center gap-2">
-        @if(isset($actions))
-            <div class="flex items-center space-x-2">
-                {{ $actions }}
-            </div>
-        @endif
+        @foreach($this->getActions() as $action)
+            <button
+                wire:click="executeAction('{{ $action->getKey() }}')"
+                @if($action->getConfirmMessage()) onclick="return confirm('{{ $action->getConfirmMessage() }}')" @endif
+                class="px-4 py-2 text-sm font-medium rounded-md {{ $action->getClass() }}"
+            >
+                @if($action->getIcon())
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        {!! $action->getIcon() !!}
+                    </svg>
+                @endif
+                {{ $action->getLabel() }}
+            </button>
+        @endforeach
     </div>
 </div>

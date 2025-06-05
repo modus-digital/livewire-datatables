@@ -22,7 +22,7 @@ abstract class Filter
         $this->field = strtolower(str_replace(' ', '_', $name));
     }
 
-    public static function make(string $name): static
+    final public static function make(string $name): static
     {
         return new static($name);
     }

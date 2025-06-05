@@ -44,6 +44,19 @@ class TextFilter extends Filter
             return $query;
         }
 
+        if (str_contains($this->field, '.')) {
+            [$relation, $field] = explode('.', $this->field, 2);
+
+            return $query->whereHas($relation, function (Builder $q) use ($field, $value) {
+                match ($this->operator) {
+                    '=' => $q->where($field, $value),
+                    'starts_with' => $q->where($field, 'like', "{$value}%"),
+                    'ends_with' => $q->where($field, 'like', "%{$value}"),
+                    default => $q->where($field, 'like', "%{$value}%"),
+                };
+            });
+        }
+
         return match ($this->operator) {
             '=' => $query->where($this->field, $value),
             'like' => $query->where($this->field, 'like', "%{$value}%"),
