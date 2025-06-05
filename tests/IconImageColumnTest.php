@@ -6,8 +6,10 @@ use ModusDigital\LivewireDatatables\Columns\ImageColumn;
 it('renders icon with count and image shapes', function () {
     $iconColumn = IconColumn::make('Icon')->icon('<svg></svg>')->count('total');
 
-    $record = new class {
+    $record = new class
+    {
         public int $total = 5;
+
         public string $avatar = 'a.png';
     };
 

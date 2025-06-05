@@ -41,6 +41,7 @@ class DateFilter extends Filter
         if ($this->range && is_array($value)) {
             if (str_contains($this->field, '.')) {
                 [$relation, $field] = explode('.', $this->field, 2);
+
                 return $query->whereHas($relation, function (Builder $q) use ($field, $value) {
                     if (! empty($value['from'])) {
                         $q->where($field, '>=', Carbon::parse($value['from'])->startOfDay());
@@ -63,6 +64,7 @@ class DateFilter extends Filter
 
         if (str_contains($this->field, '.')) {
             [$relation, $field] = explode('.', $this->field, 2);
+
             return $query->whereHas($relation, fn (Builder $q) => $q->whereDate($field, Carbon::parse($value)));
         }
 

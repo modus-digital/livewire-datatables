@@ -9,11 +9,17 @@ use Closure;
 class Action
 {
     protected string $key;
+
     protected string $label;
+
     protected ?string $icon = null;
+
     protected string $class = 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white';
+
     protected ?string $confirmMessage = null;
+
     protected bool|Closure $visible = true;
+
     protected ?Closure $callback = null;
 
     public function __construct(string $key, string $label)

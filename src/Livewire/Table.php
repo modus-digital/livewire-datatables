@@ -10,20 +10,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use ModusDigital\LivewireDatatables\Concerns\HasActions;
 use ModusDigital\LivewireDatatables\Concerns\HasColumns;
 use ModusDigital\LivewireDatatables\Concerns\HasFilters;
 use ModusDigital\LivewireDatatables\Concerns\HasPagination;
-use ModusDigital\LivewireDatatables\Concerns\HasActions;
 use ModusDigital\LivewireDatatables\Concerns\HasRowActions;
 use ModusDigital\LivewireDatatables\Concerns\HasRowSelection;
 use ModusDigital\LivewireDatatables\Concerns\HasSorting;
 
 abstract class Table extends Component
 {
+    use HasActions;
     use HasColumns;
     use HasFilters;
     use HasPagination;
-    use HasActions;
     use HasRowActions;
     use HasRowSelection;
     use HasSorting;

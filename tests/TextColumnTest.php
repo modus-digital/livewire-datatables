@@ -10,7 +10,8 @@ enum Status: string
 it('limits text and casts enums', function () {
     $column = TextColumn::make('Status')->limit(3);
 
-    $record = new class {
+    $record = new class
+    {
         public Status $status = Status::OPEN;
     };
 
