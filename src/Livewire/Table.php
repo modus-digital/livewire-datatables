@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use ModusDigital\LivewireDatatables\Concerns\HasActions;
 use ModusDigital\LivewireDatatables\Concerns\HasColumns;
 use ModusDigital\LivewireDatatables\Concerns\HasFilters;
 use ModusDigital\LivewireDatatables\Concerns\HasPagination;
@@ -19,6 +20,7 @@ use ModusDigital\LivewireDatatables\Concerns\HasSorting;
 
 abstract class Table extends Component
 {
+    use HasActions;
     use HasColumns;
     use HasFilters;
     use HasPagination;
@@ -161,7 +163,10 @@ abstract class Table extends Component
      */
     public function render()
     {
-        return view('livewire-datatables::table', [
+        /** @var view-string $view */
+        $view = 'livewire-datatables::table';
+
+        return view($view, [
             'rows' => $this->getRows(),
         ]);
     }

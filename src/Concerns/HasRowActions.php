@@ -6,10 +6,11 @@ namespace ModusDigital\LivewireDatatables\Concerns;
 
 use Closure;
 use Illuminate\Support\Collection;
+use ModusDigital\LivewireDatatables\Actions\RowAction;
 
 trait HasRowActions
 {
-    /** @var array<string, array> */
+    /** @var RowAction[] */
     protected array $rowActionsCache = [];
 
     /**
@@ -47,13 +48,13 @@ trait HasRowActions
     public function executeRowAction(string $action, string|int $id): void
     {
         $actions = $this->getRowActions();
-        $actionConfig = $actions->firstWhere('key', $action);
+        $actionConfig = $actions->first(fn (RowAction $a) => $a->getKey() === $action);
 
         if (! $actionConfig) {
             return;
         }
 
-        $callback = $actionConfig['callback'] ?? null;
+        $callback = $actionConfig?->getCallback();
         if ($callback instanceof Closure) {
             $record = $this->getModel()->find($id);
             if ($record) {
@@ -63,83 +64,11 @@ trait HasRowActions
     }
 
     /**
-     * Create a row action configuration.
-     */
-    protected function action(string $key, string $label): array
-    {
-        return [
-            'key' => $key,
-            'label' => $label,
-            'callback' => null,
-            'icon' => null,
-            'class' => 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white',
-            'confirmMessage' => null,
-            'visible' => true,
-        ];
-    }
-
-    /**
-     * Add callback to action.
-     */
-    protected function actionCallback(array $action, Closure $callback): array
-    {
-        $action['callback'] = $callback;
-
-        return $action;
-    }
-
-    /**
-     * Add icon to action.
-     */
-    protected function actionIcon(array $action, string $icon): array
-    {
-        $action['icon'] = $icon;
-
-        return $action;
-    }
-
-    /**
-     * Add CSS class to action.
-     */
-    protected function actionClass(array $action, string $class): array
-    {
-        $action['class'] = $class;
-
-        return $action;
-    }
-
-    /**
-     * Add confirmation message to action.
-     */
-    protected function actionConfirm(array $action, string $message): array
-    {
-        $action['confirmMessage'] = $message;
-
-        return $action;
-    }
-
-    /**
-     * Set action visibility condition.
-     */
-    protected function actionVisible(array $action, bool|Closure $condition): array
-    {
-        $action['visible'] = $condition;
-
-        return $action;
-    }
-
-    /**
      * Check if an action is visible for a record.
      */
-    public function isActionVisible(array $action, mixed $record): bool
+    public function isActionVisible(RowAction $action, mixed $record): bool
     {
-        $visible = $action['visible'] ?? true;
-
-        if ($visible instanceof Closure) {
-            return $visible($record);
-        }
-
-        return (bool) $visible;
+        return $action->isVisible($record);
     }
 
     /**
@@ -147,6 +76,6 @@ trait HasRowActions
      */
     public function getRecordActions(mixed $record): Collection
     {
-        return $this->getRowActions()->filter(fn ($action) => $this->isActionVisible($action, $record));
+        return $this->getRowActions()->filter(fn (RowAction $action) => $this->isActionVisible($action, $record));
     }
 }

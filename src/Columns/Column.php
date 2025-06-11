@@ -137,6 +137,12 @@ class Column
     {
         $value = $this->extractValue($record);
 
+        if ($value instanceof \BackedEnum) {
+            $value = $value->value;
+        } elseif ($value instanceof \UnitEnum) {
+            $value = $value->name;
+        }
+
         if ($this->formatCallback) {
             return call_user_func($this->formatCallback, $value, $record);
         }
