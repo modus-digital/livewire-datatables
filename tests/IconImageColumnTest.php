@@ -37,3 +37,16 @@ it('supports callback icons and counts', function () {
     expect($value)->toContain('<i class="fa-check"></i>')
         ->and($value)->toContain('2');
 });
+
+it('uses src override when provided', function () {
+    $column = ImageColumn::make('avatar')->src(fn ($record) => 'thumbs/' . $record->avatar);
+
+    $record = new class
+    {
+        public string $avatar = 'a.png';
+    };
+
+    $value = $column->getValue($record);
+
+    expect($value)->toContain('thumbs/a.png');
+});
