@@ -25,8 +25,10 @@ it('supports callback icons and counts', function () {
         ->icon(fn ($record) => $record->active ? 'fa-check' : '<svg></svg>')
         ->count(fn ($record) => $record->total);
 
-    $record = new class {
+    $record = new class
+    {
         public bool $active = true;
+
         public int $total = 2;
     };
 
@@ -37,9 +39,10 @@ it('supports callback icons and counts', function () {
 });
 
 it('uses src override when provided', function () {
-    $column = ImageColumn::make('avatar')->src(fn ($record) => 'thumbs/'.$record->avatar);
+    $column = ImageColumn::make('avatar')->src(fn ($record) => 'thumbs/' . $record->avatar);
 
-    $record = new class {
+    $record = new class
+    {
         public string $avatar = 'a.png';
     };
 

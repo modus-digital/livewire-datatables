@@ -21,8 +21,10 @@ it('limits text and casts enums', function () {
 it('renders badge using callback and field fallback', function () {
     $column = TextColumn::make('role')->badge(fn ($record) => $record->color);
 
-    $record = new class {
+    $record = new class
+    {
         public string $role = 'Admin';
+
         public string $color = 'green';
     };
 
