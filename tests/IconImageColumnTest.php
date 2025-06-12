@@ -25,8 +25,10 @@ it('supports callback icons and counts', function () {
         ->icon(fn ($record) => $record->active ? 'fa-check' : '<svg></svg>')
         ->count(fn ($record) => $record->total);
 
-    $record = new class {
+    $record = new class
+    {
         public bool $active = true;
+
         public int $total = 2;
     };
 
