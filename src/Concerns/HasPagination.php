@@ -49,14 +49,14 @@ trait HasPagination
      */
     public function paginationView(): string
     {
-        return 'livewire.tables.partials.pagination';
+        return 'livewire-datatables::partials.pagination';
     }
 
     /**
      * Get the simple pagination view.
      */
-    public function simplePaginationView(): string
+    public function paginationSimpleView(): string
     {
-        return 'livewire.tables.partials.simple-pagination';
+        return 'livewire-datatables::partials.pagination';
     }
 }

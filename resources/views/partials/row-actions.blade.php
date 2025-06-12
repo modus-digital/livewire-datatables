@@ -26,18 +26,18 @@
             <div class="py-1">
                 @foreach($this->getRecordActions($record) as $action)
                     <button
-                        wire:click="executeRowAction('{{ $action['key'] }}', {{ $record->id }})"
-                        @if($action['confirmMessage'])
-                            onclick="return confirm('{{ $action['confirmMessage'] }}')"
+                        wire:click="executeRowAction('{{ $action->getKey() }}', {{ $record->id }})"
+                        @if($action->getConfirmMessage())
+                            onclick="return confirm('{{ $action->getConfirmMessage() }}')"
                         @endif
-                        class="flex items-center w-full px-4 py-2 text-sm {{ $action['class'] }} hover:bg-gray-100 dark:hover:bg-gray-700"
+                        class="flex items-center w-full px-4 py-2 text-sm {{ $action->getClass() }} hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
-                        @if($action['icon'])
+                        @if($action->getIcon())
                             <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                {!! $action['icon'] !!}
+                                {!! $action->getIcon() !!}
                             </svg>
                         @endif
-                        {{ $action['label'] }}
+                        {{ $action->getLabel() }}
                     </button>
                 @endforeach
             </div>

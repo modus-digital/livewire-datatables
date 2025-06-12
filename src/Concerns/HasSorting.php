@@ -66,12 +66,19 @@ trait HasSorting
                     $model = $this->getModel();
                     $relationInstance = $model->{$relationName}();
                     $relationTable = $relationInstance->getRelated()->getTable();
-                    $foreignKey = $relationInstance->getForeignKeyName();
-                    $localKey = $relationInstance->getLocalKeyName();
 
-                    $query->leftJoin($relationTable, "{$model->getTable()}.{$localKey}", '=', "{$relationTable}.{$foreignKey}")
-                        ->orderBy("{$relationTable}.{$relationField}", $sortDirection)
-                        ->select("{$model->getTable()}.*");
+                    if ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
+                        $foreignKey = $relationInstance->getForeignKeyName();
+                        $ownerKey = $relationInstance->getOwnerKeyName();
+                        $query->leftJoin($relationTable, $model->getTable() . '.' . $foreignKey, '=', $relationTable . '.' . $ownerKey);
+                    } elseif ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasOne || $relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
+                        $foreignKey = $relationInstance->getForeignKeyName();
+                        $localKey = $relationInstance->getLocalKeyName();
+                        $query->leftJoin($relationTable, $relationTable . '.' . $foreignKey, '=', $model->getTable() . '.' . $localKey);
+                    }
+
+                    $query->orderBy("{$relationTable}.{$relationField}", $sortDirection)
+                        ->select($model->getTable() . '.*');
 
                     return $query;
                 }

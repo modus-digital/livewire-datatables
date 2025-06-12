@@ -20,6 +20,19 @@ A reusable, highly-customizable **Livewire Datatable** component for the TALL st
 - 📱 **Responsive design** for all screen sizes
 - ♿ **Accessibility features** built-in
 
+## Package Overview
+
+This repository is a Laravel package that ships a ready-to-use datatable component built with Livewire. The goal is to provide a clean starting point that you can easily extend.
+
+**Key directories**
+
+- `src/` – The `Table` Livewire component, traits, column definitions and filters.
+- `resources/views/` – Blade templates that render the table.
+- `resources/stubs/` – Stub used by the `make:table` command.
+- `tests/` – Pest tests and architecture rules.
+
+The `Table` class orchestrates querying your model, applying search, filters, sorting and pagination so your table class focuses on describing columns and filters.
+
 ## Installation
 
 You can install the package via composer:
@@ -44,6 +57,7 @@ php artisan vendor:publish --tag="livewire-datatables-views"
 use App\Models\User;
 use ModusDigital\LivewireDatatables\Table;
 use ModusDigital\LivewireDatatables\Columns\Column;
+use ModusDigital\LivewireDatatables\Columns\TextColumn;
 use ModusDigital\LivewireDatatables\Filters\SelectFilter;
 
 class UsersTable extends Table
@@ -67,9 +81,10 @@ class UsersTable extends Table
                 ->relationship('profile', 'role')
                 ->sortable(),
 
-            Column::make('Status')
+            TextColumn::make('Status')
                 ->field('status')
-                ->format(fn($value) => ucfirst($value)),
+                ->badge()
+                ->limit(10),
         ];
     }
 
@@ -94,6 +109,10 @@ class UsersTable extends Table
 </div>
 ```
 
+## How It Works
+
+The table component builds a query from your model, applies global search, filters and sorting, then paginates the results. Each column can be marked sortable or searchable and may format its value using a callback. Filters implement a simple `apply()` method so you can easily add custom logic. The included Blade views render everything with Tailwind classes.
+
 ## Advanced Usage
 
 ### Column Configuration
@@ -112,6 +131,25 @@ Column::make('Created')
 Column::make('Actions')
     ->view('components.user-actions')
     ->attributes(['cell_class' => 'text-right']),
+```
+
+### Dynamic Icons & Badges
+
+```php
+use ModusDigital\LivewireDatatables\Columns\IconColumn;
+use ModusDigital\LivewireDatatables\Columns\TextColumn;
+
+protected function columns(): array
+{
+    return [
+        IconColumn::make('status')
+            ->icon(fn($record) => $record->active ? 'fa-check' : '<svg></svg>')
+            ->count(fn($record) => $record->notifications_count),
+
+        TextColumn::make('role')
+            ->badge(fn($record) => $record->role_color),
+    ];
+}
 ```
 
 ### Row Selection & Bulk Actions
@@ -153,19 +191,13 @@ class UsersTable extends Table
 ### Row Actions
 
 ```php
+use ModusDigital\LivewireDatatables\Actions\RowAction;
+
 protected function rowActions(): array
 {
     return [
-        [
-            'name' => 'Edit',
-            'key' => 'edit',
-            'icon' => '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>',
-        ],
-        [
-            'name' => 'Delete',
-            'key' => 'delete',
-            'class' => 'text-red-600 hover:text-red-900',
-        ],
+        RowAction::make('edit', 'Edit')->icon('<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>'),
+        RowAction::make('delete', 'Delete')->class('text-red-600 hover:text-red-900'),
     ];
 }
 
@@ -184,15 +216,14 @@ public function rowActionDelete($row)
 ### Global Actions
 
 ```php
+use ModusDigital\LivewireDatatables\Actions\Action;
+
 protected function globalActions(): array
 {
     return [
-        [
-            'name' => 'Add User',
-            'key' => 'create',
-            'label' => '+ Add User',
-            'class' => 'bg-orange-600 hover:bg-orange-700',
-        ],
+        Action::make('create', 'Add User')
+            ->class('bg-orange-600 hover:bg-orange-700')
+            ->label('+ Add User'),
     ];
 }
 
@@ -278,6 +309,13 @@ The package follows a modular architecture using traits:
 - **`HasRowActions`** - Individual row actions
 
 Each trait is under 150 lines of code and fully unit tested.
+
+## Next Steps
+
+- Browse the traits in `src/Concerns` to understand how each feature works.
+- Customize the Blade templates in `resources/views` to match your design.
+- Use the `make:table` Artisan command to scaffold new tables from the provided stub.
+- Run `composer analyse` and `composer test` to ensure quality as you extend the package.
 
 ## Requirements
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ModusDigital\LivewireDatatables\Columns;
 
 use Closure;
+use Illuminate\Support\Str;
 
 class Column
 {
@@ -28,13 +29,13 @@ class Column
 
     public function __construct(string $name)
     {
-        $this->name = $name;
-        $this->field = strtolower(str_replace(' ', '_', $name));
+        $this->name = Str::headline($name);
+        $this->field = $name;
     }
 
-    public static function make(string $name): self
+    public static function make(string $name): static
     {
-        return new self($name);
+        return new static($name);
     }
 
     public function field(string $field): self
@@ -136,6 +137,12 @@ class Column
     public function getValue(mixed $record): mixed
     {
         $value = $this->extractValue($record);
+
+        if ($value instanceof \BackedEnum) {
+            $value = $value->value;
+        } elseif ($value instanceof \UnitEnum) {
+            $value = $value->name;
+        }
 
         if ($this->formatCallback) {
             return call_user_func($this->formatCallback, $value, $record);
