@@ -133,6 +133,25 @@ Column::make('Actions')
     ->attributes(['cell_class' => 'text-right']),
 ```
 
+### Dynamic Icons & Badges
+
+```php
+use ModusDigital\LivewireDatatables\Columns\IconColumn;
+use ModusDigital\LivewireDatatables\Columns\TextColumn;
+
+protected function columns(): array
+{
+    return [
+        IconColumn::make('status')
+            ->icon(fn($record) => $record->active ? 'fa-check' : '<svg></svg>')
+            ->count(fn($record) => $record->notifications_count),
+
+        TextColumn::make('role')
+            ->badge(fn($record) => $record->role_color),
+    ];
+}
+```
+
 ### Row Selection & Bulk Actions
 
 ```php
