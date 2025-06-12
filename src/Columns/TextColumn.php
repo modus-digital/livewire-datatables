@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ModusDigital\LivewireDatatables\Columns;
 
+use Closure;
 use Illuminate\Support\Str;
 
 class TextColumn extends Column
@@ -12,12 +13,23 @@ class TextColumn extends Column
 
     protected string $badgeColor = 'gray';
 
+    protected ?Closure $badgeCallback = null;
+
     protected ?int $limit = null;
 
-    public function badge(bool $badge = true, string $color = 'gray'): self
+    public function badge(bool|string|Closure $badge = true, string $color = 'gray'): self
     {
-        $this->badge = $badge;
-        $this->badgeColor = $color;
+        if ($badge instanceof Closure) {
+            $this->badgeCallback = $badge;
+            $this->badgeColor = $color;
+            $this->badge = true;
+        } elseif (is_string($badge)) {
+            $this->badge = true;
+            $this->badgeColor = $badge;
+        } else {
+            $this->badge = $badge;
+            $this->badgeColor = $color;
+        }
 
         return $this;
     }
@@ -43,8 +55,21 @@ class TextColumn extends Column
             $value = Str::limit($value, $this->limit);
         }
 
-        if ($this->badge) {
-            $classes = "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{$this->badgeColor}-100 text-{$this->badgeColor}-800 dark:bg-{$this->badgeColor}-800 dark:text-{$this->badgeColor}-100";
+        $badge = $this->badge;
+        $color = $this->badgeColor;
+
+        if ($this->badgeCallback) {
+            $result = call_user_func($this->badgeCallback, $record);
+            if (is_string($result)) {
+                $color = $result;
+                $badge = true;
+            } else {
+                $badge = (bool) $result;
+            }
+        }
+
+        if ($badge) {
+            $classes = "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{$color}-100 text-{$color}-800 dark:bg-{$color}-800 dark:text-{$color}-100";
 
             return "<span class=\"{$classes}\">{$value}</span>";
         }

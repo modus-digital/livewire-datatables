@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ModusDigital\LivewireDatatables\Columns;
 
 use Closure;
+use Illuminate\Support\Str;
 
 class Column
 {
@@ -28,8 +29,8 @@ class Column
 
     public function __construct(string $name)
     {
-        $this->name = $name;
-        $this->field = strtolower(str_replace(' ', '_', $name));
+        $this->name = Str::headline($name);
+        $this->field = $name;
     }
 
     public static function make(string $name): static
