@@ -2,6 +2,19 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.1.1 - 2025-06-17
+
+### What's Changed
+
+* Bump stefanzweifel/git-auto-commit-action from 5 to 6 by @dependabot in https://github.com/modus-digital/livewire-datatables/pull/9
+* Fix: Removed whitespace if no filters/actions/search is enabled by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/10
+
+### New Contributors
+
+* @dependabot made their first contribution in https://github.com/modus-digital/livewire-datatables/pull/9
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.1.0...1.1.1
+
 ## 1.1.0 - 2025-06-12
 
 ### What's Changed
