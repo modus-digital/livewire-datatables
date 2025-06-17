@@ -1,5 +1,7 @@
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg w-full">
-    @include('livewire-datatables::partials.header')
+    @if($this->isSearchable() || !empty($actions) || count($this->getFilters()))
+        @include('livewire-datatables::partials.header')
+    @endif
 
     @if($this->isSearchable() || !empty($actions))
         <div class="border-b border-gray-200 dark:border-gray-700 mx-4"></div>
