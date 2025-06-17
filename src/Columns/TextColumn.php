@@ -78,7 +78,7 @@ class TextColumn extends Column
         }
 
         if ($badge) {
-            $classes = "px-2 inline-flex text-xs leading-5 font-semibold rounded-md";
+            $classes = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-md';
             $classes .= $this->fullWidth ? ' w-full' : ' ';
             $classes .= " bg-{$color}-100 text-{$color}-800 dark:bg-{$color}-800 dark:text-{$color}-100";
 
