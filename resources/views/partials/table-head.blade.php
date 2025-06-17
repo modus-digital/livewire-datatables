@@ -17,7 +17,7 @@
                 scope="col"
                 @class([
                     'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800' => $column->isSortable(),
-                    'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400'
+                    'px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400'
                 ])
                 @if($column->isSortable()) wire:click="sortBy('{{ $column->getField() }}')" @endif
                 @if($column->getWidth()) style="width: {{ $column->getWidth() }}" @endif

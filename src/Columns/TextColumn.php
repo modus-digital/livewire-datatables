@@ -17,6 +17,8 @@ class TextColumn extends Column
 
     protected ?int $limit = null;
 
+    protected bool $fullWidth = false;
+
     public function badge(bool|string|Closure $badge = true, string $color = 'gray'): self
     {
         if ($badge instanceof Closure) {
@@ -37,6 +39,13 @@ class TextColumn extends Column
     public function limit(int $limit): self
     {
         $this->limit = $limit;
+
+        return $this;
+    }
+
+    public function fullWidth(bool $fullWidth = true): self
+    {
+        $this->fullWidth = $fullWidth;
 
         return $this;
     }
@@ -69,7 +78,9 @@ class TextColumn extends Column
         }
 
         if ($badge) {
-            $classes = "px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-{$color}-100 text-{$color}-800 dark:bg-{$color}-800 dark:text-{$color}-100";
+            $classes = "px-2 inline-flex text-xs leading-5 font-semibold rounded-md";
+            $classes .= $this->fullWidth ? ' w-full' : ' ';
+            $classes .= " bg-{$color}-100 text-{$color}-800 dark:bg-{$color}-800 dark:text-{$color}-100";
 
             return "<span class=\"{$classes}\">{$value}</span>";
         }
