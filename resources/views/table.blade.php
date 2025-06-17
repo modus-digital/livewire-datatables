@@ -7,9 +7,11 @@
         <div class="border-b border-gray-200 dark:border-gray-700 mx-4"></div>
     @endif
 
-    <div class="px-6 py-4 mb-4 overflow-x-auto">
-        @include('livewire-datatables::partials.filters')
-    </div>
+    @if(count($this->getFilters()))
+        <div class="px-6 py-4 mb-4 overflow-x-auto">
+            @include('livewire-datatables::partials.filters')
+        </div>
+    @endif
 
     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         @include('livewire-datatables::partials.table-head')
@@ -26,3 +28,4 @@
     @endif
 
 </div>
+
