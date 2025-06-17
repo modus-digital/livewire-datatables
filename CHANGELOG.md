@@ -2,6 +2,14 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.1.2 - 2025-06-17
+
+### What's Changed
+
+* Fix: Removed whitespace if no filters/actions/search is enabled by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/11
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.1.1...1.1.2
+
 ## 1.1.1 - 2025-06-17
 
 ### What's Changed
