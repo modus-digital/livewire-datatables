@@ -41,6 +41,10 @@ class IconColumn extends Column
             $icon = "<i class=\"{$icon}\"></i>";
         }
 
+        if (is_string($icon) && ! Str::contains($icon, '<svg') && Str::contains($icon, 'heroicon')) {
+            $icon = svg(name: $icon, class: 'w-4 h-4');
+        }
+
         $countHtml = $count !== null ? "<span class=\"ml-1 text-xs\">{$count}</span>" : '';
 
         return "<span class=\"inline-flex items-center\">{$icon}{$countHtml}</span>";
