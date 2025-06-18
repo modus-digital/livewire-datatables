@@ -2,6 +2,14 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.1.4 - 2025-06-18
+
+### What's Changed
+
+* Added support for heroicons and fix badges by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/13
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.1.3...1.1.4
+
 ## 1.1.3 - 2025-06-18
 
 ### What's Changed
