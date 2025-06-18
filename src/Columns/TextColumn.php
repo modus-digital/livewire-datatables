@@ -78,8 +78,8 @@ class TextColumn extends Column
         }
 
         if ($badge) {
-            $classes = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-sm';
-            $classes .= $this->fullWidth ? ' w-full' : ' ';
+            $classes = 'px-4 py-2 inline-flex text-xs leading-5 font-semibold rounded-sm';
+            $classes .= $this->fullWidth ? ' w-full justify-center' : ' ';
 
             // Use a switch statement to handle different color variants
             // This ensures all classes are statically available for JIT mode
