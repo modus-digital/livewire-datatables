@@ -6,7 +6,7 @@
                     type="checkbox"
                     wire:model.live="selectAll"
                     wire:click="toggleSelectAll"
-                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-xs focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
             </th>
         @endif
@@ -23,9 +23,23 @@
                 @if($column->getWidth()) style="width: {{ $column->getWidth() }}" @endif
             >
                 <div class="flex items-center gap-2">
-                    <span class="@if($column->getAlign()) text-{{ $column->getAlign() }} @endif">
-                        {{ $column->getName() }}
-                    </span>
+                    @if($column->getAlign() === 'left')
+                        <span class="text-left">
+                            {{ $column->getName() }}
+                        </span>
+                    @elseif($column->getAlign() === 'center')
+                        <span class="text-center">
+                            {{ $column->getName() }}
+                        </span>
+                    @elseif($column->getAlign() === 'right')
+                        <span class="text-right">
+                            {{ $column->getName() }}
+                        </span>
+                    @else
+                        <span>
+                            {{ $column->getName() }}
+                        </span>
+                    @endif
 
                     @if($column->isSortable())
                         <span class="ml-2">

@@ -79,7 +79,9 @@ class SelectFilter extends Filter
 
         return "
             <div class=\"relative\">
-                <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">{$this->name}</label>
+                <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">
+                    {$this->name}
+                </label>
                 <select
                     wire:model.live=\"filters.{$this->field}\"
                     class=\"{$selectClass}\"
