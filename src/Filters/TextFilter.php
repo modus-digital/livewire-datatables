@@ -73,7 +73,9 @@ class TextFilter extends Filter
 
         return "
             <div class=\"relative\">
-                <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">{$this->name}</label>
+                <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">
+                    {$this->name}
+                </label>
                 <input
                     type=\"text\"
                     wire:model.live.debounce.300ms=\"filters.{$this->field}\"

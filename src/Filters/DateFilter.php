@@ -78,7 +78,9 @@ class DateFilter extends Filter
         if ($this->range) {
             return "
                 <div class=\"relative\">
-                    <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">{$this->name}</label>
+                    <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">
+                        {$this->name}
+                    </label>
                     <div class=\"grid grid-cols-2 gap-2\">
                         <input
                             type=\"date\"
@@ -99,7 +101,9 @@ class DateFilter extends Filter
 
         return "
             <div class=\"relative\">
-                <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">{$this->name}</label>
+                <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">
+                    {$this->name}
+                </label>
                 <input
                     type=\"date\"
                     wire:model.live=\"filters.{$this->field}\"

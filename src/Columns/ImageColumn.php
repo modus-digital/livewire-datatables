@@ -35,7 +35,7 @@ class ImageColumn extends Column
         } else {
             $src = parent::getValue($record);
         }
-        $class = $this->circle ? 'rounded-full' : 'rounded-md';
+        $class = $this->circle ? 'rounded-full' : 'rounded-sm';
 
         return "<img src=\"{$src}\" class=\"h-8 w-8 object-cover {$class}\" />";
     }

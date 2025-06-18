@@ -57,7 +57,7 @@
                     @else
                         <button
                             wire:click="previousPage"
-                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
+                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
                         >
                             <span class="sr-only">Previous</span>
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
