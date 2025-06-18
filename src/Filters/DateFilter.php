@@ -65,7 +65,7 @@ class DateFilter extends Filter
         if (str_contains($this->field, '.')) {
             [$relation, $field] = explode('.', $this->field, 2);
 
-            return $query->whereHas($relation, fn(Builder $q) => $q->whereDate($field, Carbon::parse($value)));
+            return $query->whereHas($relation, fn (Builder $q) => $q->whereDate($field, Carbon::parse($value)));
         }
 
         return $query->whereDate($this->field, Carbon::parse($value));
