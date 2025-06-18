@@ -2,6 +2,14 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.1.3 - 2025-06-18
+
+### What's Changed
+
+* Dev by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/12
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.1.2...1.1.3
+
 ## 1.1.2 - 2025-06-17
 
 ### What's Changed
