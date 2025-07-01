@@ -82,6 +82,15 @@ trait HasColumns
      */
     public function renderCell(Column $column, mixed $record): mixed
     {
-        return $column->getValue($record);
+        $value = $column->getValue($record);
+
+        if ($view = $column->getView()) {
+            return view($view, [
+                'record' => $record,
+                'value' => $value,
+            ])->render();
+        }
+
+        return $value;
     }
 }

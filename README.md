@@ -16,6 +16,7 @@ A reusable, highly-customizable **Livewire Datatable** component for the TALL st
 - 📄 **Pagination** with customizable page sizes
 - ✅ **Row selection** with bulk actions
 - 🔧 **Highly customizable** with traits and concerns
+- 🔭 **Custom cell views** for rendering complex content
 - 🧪 **Fully tested** with Pest 3
 - 📱 **Responsive design** for all screen sizes
 - ♿ **Accessibility features** built-in
@@ -83,7 +84,7 @@ class UsersTable extends Table
 
             TextColumn::make('Status')
                 ->field('status')
-                ->badge()
+                ->badge() // badges span the full cell width by default
                 ->limit(10),
         ];
     }
@@ -117,6 +118,8 @@ The table component builds a query from your model, applies global search, filte
 
 ### Column Configuration
 
+To render complex HTML or even embed a Livewire component, provide a custom view using `->view()`. The view receives the row `record` and the column `value`.
+
 ```php
 Column::make('Avatar')
     ->field('avatar_url')
@@ -147,7 +150,7 @@ protected function columns(): array
             ->count(fn($record) => $record->notifications_count),
 
         TextColumn::make('role')
-            ->badge(fn($record) => $record->role_color),
+            ->badge(fn($record) => $record->role_color), // spans full width
     ];
 }
 ```

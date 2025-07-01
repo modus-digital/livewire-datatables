@@ -33,6 +33,8 @@ class TextColumn extends Column
             $this->badgeColor = $color;
         }
 
+        $this->fullWidth = true;
+
         return $this;
     }
 
