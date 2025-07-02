@@ -52,36 +52,39 @@ trait HasSorting
         $sortField = $this->sortField ?: $this->defaultSortField;
         $sortDirection = $this->sortDirection ?: $this->defaultSortDirection;
 
-        // Handle relationship sorting
+        $relationship = null;
         if ($column = $this->getColumn($sortField)) {
             $sortField = $column->getSortField();
+            $relationship = $column->getRelationship();
+        }
 
-            // If it's a relationship, we need to join the table
-            if ($column->getRelationship()) {
-                $relation = $column->getRelationship();
-                $parts = explode('.', $relation);
+        if (! $relationship && str_contains($sortField, '.')) {
+            $relationship = $sortField;
+        }
 
-                if (count($parts) === 2) {
-                    [$relationName, $relationField] = $parts;
-                    $model = $this->getModel();
-                    $relationInstance = $model->{$relationName}();
-                    $relationTable = $relationInstance->getRelated()->getTable();
+        if ($relationship) {
+            $parts = explode('.', $relationship);
 
-                    if ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
-                        $foreignKey = $relationInstance->getForeignKeyName();
-                        $ownerKey = $relationInstance->getOwnerKeyName();
-                        $query->leftJoin($relationTable, $model->getTable() . '.' . $foreignKey, '=', $relationTable . '.' . $ownerKey);
-                    } elseif ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasOne || $relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
-                        $foreignKey = $relationInstance->getForeignKeyName();
-                        $localKey = $relationInstance->getLocalKeyName();
-                        $query->leftJoin($relationTable, $relationTable . '.' . $foreignKey, '=', $model->getTable() . '.' . $localKey);
-                    }
+            if (count($parts) === 2) {
+                [$relationName, $relationField] = $parts;
+                $model = $this->getModel();
+                $relationInstance = $model->{$relationName}();
+                $relationTable = $relationInstance->getRelated()->getTable();
 
-                    $query->orderBy("{$relationTable}.{$relationField}", $sortDirection)
-                        ->select($model->getTable() . '.*');
-
-                    return $query;
+                if ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
+                    $foreignKey = $relationInstance->getForeignKeyName();
+                    $ownerKey = $relationInstance->getOwnerKeyName();
+                    $query->leftJoin($relationTable, $model->getTable() . '.' . $foreignKey, '=', $relationTable . '.' . $ownerKey);
+                } elseif ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasOne || $relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
+                    $foreignKey = $relationInstance->getForeignKeyName();
+                    $localKey = $relationInstance->getLocalKeyName();
+                    $query->leftJoin($relationTable, $relationTable . '.' . $foreignKey, '=', $model->getTable() . '.' . $localKey);
                 }
+
+                $query->orderBy("{$relationTable}.{$relationField}", $sortDirection)
+                    ->select($model->getTable() . '.*');
+
+                return $query;
             }
         }
 

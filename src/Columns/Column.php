@@ -27,6 +27,8 @@ class Column
 
     protected ?string $align = null;
 
+    protected ?string $view = null;
+
     public function __construct(string $name)
     {
         $this->name = Str::headline($name);
@@ -94,6 +96,13 @@ class Column
         return $this;
     }
 
+    public function view(string $view): self
+    {
+        $this->view = $view;
+
+        return $this;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -132,6 +141,11 @@ class Column
     public function getAlign(): ?string
     {
         return $this->align;
+    }
+
+    public function getView(): ?string
+    {
+        return $this->view;
     }
 
     public function getValue(mixed $record): mixed
