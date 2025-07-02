@@ -56,7 +56,11 @@ trait HasFilters
     public function applyFilters(Builder $query): Builder
     {
         foreach ($this->getFilters() as $filter) {
-            $value = $this->filters[$filter->getField()] ?? null;
+            $field = $filter->getField();
+
+            // Handle dotted field names (e.g., 'client.status') by using data_get
+            // which can access nested array values like $filters['client']['status']
+            $value = data_get($this->filters, $field);
 
             if ($value !== null && $value !== '' && $value !== []) {
                 $query = $filter->apply($query, $value);
@@ -80,7 +84,8 @@ trait HasFilters
      */
     public function resetFilter(string $field): void
     {
-        unset($this->filters[$field]);
+        // Handle dotted field names by using data_forget for nested arrays
+        data_forget($this->filters, $field);
         $this->resetPage();
     }
 
@@ -89,7 +94,7 @@ trait HasFilters
      */
     public function hasActiveFilters(): bool
     {
-        return ! empty(array_filter($this->filters, fn ($value) => $value !== null && $value !== '' && $value !== []));
+        return ! empty(array_filter($this->getFilterValues(), fn($value) => $value !== null && $value !== '' && $value !== []));
     }
 
     /**
@@ -97,7 +102,24 @@ trait HasFilters
      */
     public function getActiveFilterCount(): int
     {
-        return count(array_filter($this->filters, fn ($value) => $value !== null && $value !== '' && $value !== []));
+        return count(array_filter($this->getFilterValues(), fn($value) => $value !== null && $value !== '' && $value !== []));
+    }
+
+    /**
+     * Get all filter values, handling dotted field names.
+     */
+    protected function getFilterValues(): array
+    {
+        $values = [];
+        foreach ($this->getFilters() as $filter) {
+            $field = $filter->getField();
+            $value = data_get($this->filters, $field);
+            if ($value !== null) {
+                $values[$field] = $value;
+            }
+        }
+
+        return $values;
     }
 
     /**
@@ -107,8 +129,11 @@ trait HasFilters
     {
         foreach ($this->getFilters() as $filter) {
             $field = $filter->getField();
-            if (! isset($this->filters[$field]) && $filter->getDefault() !== null) {
-                $this->filters[$field] = $filter->getDefault();
+            $currentValue = data_get($this->filters, $field);
+
+            if ($currentValue === null && $filter->getDefault() !== null) {
+                // Use data_set to handle dotted field names for nested arrays
+                data_set($this->filters, $field, $filter->getDefault());
             }
         }
     }

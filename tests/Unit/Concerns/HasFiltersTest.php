@@ -74,6 +74,45 @@ it('applies filters to query', function () {
     expect($result)->toBe($query);
 });
 
+it('handles dotted field names with nested filter arrays', function () {
+    // Create a component with a dotted field filter
+    $component = new class
+    {
+        use HasFilters;
+
+        protected function filters(): array
+        {
+            return [
+                SelectFilter::make('Client Status')->field('client.status')->options(['active' => 'Active', 'inactive' => 'Inactive']),
+            ];
+        }
+
+        public function resetPage(): void
+        {
+            // Mock implementation
+        }
+    };
+
+    // Set the nested filter structure that Livewire creates
+    $component->filters = [
+        'client' => [
+            'status' => 'active',
+        ],
+    ];
+
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
+    $query = Mockery::mock(Builder::class);
+    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
+    $query->shouldReceive('whereHas')->once()->with('client', Mockery::type('Closure'))->andReturnSelf();
+
+    $result = $component->applyFilters($query);
+
+    expect($result)->toBe($query);
+});
+
 it('skips empty filter values', function () {
     $this->component->filters = [
         'name' => '',
