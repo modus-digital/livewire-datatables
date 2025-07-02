@@ -65,11 +65,16 @@ class SelectFilter extends Filter
             });
         }
 
-        if ($this->multiple && is_array($value)) {
-            return $query->whereIn($this->field, $value);
+        $field = $this->field;
+        if (! str_contains($field, '.')) {
+            $field = $query->getModel()->getTable() . '.' . $field;
         }
 
-        return $query->where($this->field, $value);
+        if ($this->multiple && is_array($value)) {
+            return $query->whereIn($field, $value);
+        }
+
+        return $query->where($field, $value);
     }
 
     public function render(): string

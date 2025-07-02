@@ -1,12 +1,21 @@
 <?php
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use ModusDigital\LivewireDatatables\Filters\TextFilter;
 
 // Helper function to create mock query
 function createMockQueryForTextFilter(): Builder
 {
-    return Mockery::mock(Builder::class);
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
+
+    $mock = Mockery::mock(Builder::class);
+    $mock->shouldReceive('getModel')->andReturn($model)->byDefault();
+
+    return $mock;
 }
 
 beforeEach(function () {
@@ -40,14 +49,14 @@ it('uses exact operator', function () {
     $filter = TextFilter::make('Name')->exact();
 
     $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('name', '=', 'John')->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.name', '=', 'John')->andReturnSelf();
 
     $filter->apply($query, 'John');
 });
 
 it('uses contains operator by default', function () {
     $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('name', 'like', '%John%')->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.name', 'like', '%John%')->andReturnSelf();
 
     $this->filter->apply($query, 'John');
 });
@@ -56,7 +65,7 @@ it('uses contains operator explicitly', function () {
     $filter = TextFilter::make('Name')->contains();
 
     $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('name', 'like', '%John%')->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.name', 'like', '%John%')->andReturnSelf();
 
     $filter->apply($query, 'John');
 });
@@ -65,7 +74,7 @@ it('uses starts with operator', function () {
     $filter = TextFilter::make('Name')->startsWith();
 
     $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('name', 'like', 'John%')->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.name', 'like', 'John%')->andReturnSelf();
 
     $filter->apply($query, 'John');
 });
@@ -74,7 +83,7 @@ it('uses ends with operator', function () {
     $filter = TextFilter::make('Name')->endsWith();
 
     $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('name', 'like', '%John')->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.name', 'like', '%John')->andReturnSelf();
 
     $filter->apply($query, 'John');
 });

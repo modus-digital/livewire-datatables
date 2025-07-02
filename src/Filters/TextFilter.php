@@ -61,12 +61,17 @@ class TextFilter extends Filter
             });
         }
 
+        $field = $this->field;
+        if (! str_contains($field, '.')) {
+            $field = $query->getModel()->getTable() . '.' . $field;
+        }
+
         return match ($this->operator) {
-            '=' => $query->where($this->field, '=', $value),
-            'like' => $query->where($this->field, 'like', "%{$value}%"),
-            'starts_with' => $query->where($this->field, 'like', "{$value}%"),
-            'ends_with' => $query->where($this->field, 'like', "%{$value}"),
-            default => $query->where($this->field, 'like', "%{$value}%"),
+            '=' => $query->where($field, '=', $value),
+            'like' => $query->where($field, 'like', "%{$value}%"),
+            'starts_with' => $query->where($field, 'like', "{$value}%"),
+            'ends_with' => $query->where($field, 'like', "%{$value}"),
+            default => $query->where($field, 'like', "%{$value}%"),
         };
     }
 

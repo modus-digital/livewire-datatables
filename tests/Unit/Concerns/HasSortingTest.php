@@ -93,8 +93,13 @@ it('applies basic sorting to query', function () {
     $this->component->sortField = 'name';
     $this->component->sortDirection = 'desc';
 
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
     $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('orderBy')->once()->with('name', 'desc')->andReturnSelf();
+    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
+    $query->shouldReceive('orderBy')->once()->with('test_table.name', 'desc')->andReturnSelf();
 
     $result = $this->component->applySorting($query);
 
@@ -102,8 +107,13 @@ it('applies basic sorting to query', function () {
 });
 
 it('applies default sorting when no sort field set', function () {
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
     $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('orderBy')->once()->with('id', 'asc')->andReturnSelf();
+    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
+    $query->shouldReceive('orderBy')->once()->with('test_table.id', 'asc')->andReturnSelf();
 
     $this->component->applySorting($query);
 });
@@ -111,8 +121,13 @@ it('applies default sorting when no sort field set', function () {
 it('uses custom sort field from column', function () {
     $this->component->sortField = 'custom_sort';
 
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
     $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('orderBy')->once()->with('actual_field', 'asc')->andReturnSelf();
+    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
+    $query->shouldReceive('orderBy')->once()->with('test_table.actual_field', 'asc')->andReturnSelf();
 
     $this->component->applySorting($query);
 });

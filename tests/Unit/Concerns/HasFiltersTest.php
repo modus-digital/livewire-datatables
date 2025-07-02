@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use ModusDigital\LivewireDatatables\Concerns\HasFilters;
 use ModusDigital\LivewireDatatables\Filters\SelectFilter;
 use ModusDigital\LivewireDatatables\Filters\TextFilter;
@@ -60,7 +61,12 @@ it('applies filters to query', function () {
         'status' => 'active',
     ];
 
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
     $query = Mockery::mock(Builder::class);
+    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
     $query->shouldReceive('where')->twice()->andReturnSelf();
 
     $result = $this->component->applyFilters($query);
@@ -75,7 +81,12 @@ it('skips empty filter values', function () {
         'email' => [],
     ];
 
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
     $query = Mockery::mock(Builder::class);
+    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
     $query->shouldNotReceive('where');
 
     $result = $this->component->applyFilters($query);
