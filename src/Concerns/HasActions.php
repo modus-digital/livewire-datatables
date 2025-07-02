@@ -12,6 +12,9 @@ trait HasActions
     /** @var Action[] */
     protected array $actionsCache = [];
 
+    /** @var Collection<int, Action>|null */
+    protected ?Collection $actionsCollection = null;
+
     /**
      * @return Action[]
      */
@@ -27,9 +30,10 @@ trait HasActions
     {
         if (empty($this->actionsCache)) {
             $this->actionsCache = $this->actions();
+            $this->actionsCollection = collect($this->actionsCache);
         }
 
-        return collect($this->actionsCache);
+        return $this->actionsCollection;
     }
 
     public function hasActions(): bool

@@ -18,6 +18,9 @@ trait HasFilters
     /** @var Filter[] */
     protected array $filterCache = [];
 
+    /** @var Collection<int, Filter>|null */
+    protected ?Collection $filtersCollection = null;
+
     /**
      * Define the filters for the table.
      * Override this method in your table class.
@@ -38,9 +41,10 @@ trait HasFilters
     {
         if (empty($this->filterCache)) {
             $this->filterCache = $this->filters();
+            $this->filtersCollection = collect($this->filterCache);
         }
 
-        return collect($this->filterCache);
+        return $this->filtersCollection;
     }
 
     /**
@@ -49,7 +53,7 @@ trait HasFilters
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
-    protected function applyFilters(Builder $query): Builder
+    public function applyFilters(Builder $query): Builder
     {
         foreach ($this->getFilters() as $filter) {
             $value = $this->filters[$filter->getField()] ?? null;

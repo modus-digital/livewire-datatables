@@ -12,6 +12,9 @@ trait HasColumns
     /** @var Column[] */
     protected array $columnCache = [];
 
+    /** @var Collection<int, Column>|null */
+    protected ?Collection $columnsCollection = null;
+
     /**
      * Define the columns for the table.
      * Override this method in your table class.
@@ -32,9 +35,10 @@ trait HasColumns
     {
         if (empty($this->columnCache)) {
             $this->columnCache = $this->columns();
+            $this->columnsCollection = collect($this->columnCache)->filter(fn (Column $column) => ! $column->isHidden());
         }
 
-        return collect($this->columnCache)->filter(fn (Column $column) => ! $column->isHidden());
+        return $this->columnsCollection;
     }
 
     /**
@@ -83,6 +87,14 @@ trait HasColumns
         $column = $this->getColumn($field);
 
         return $column ? $column->getSortField() : $field;
+    }
+
+    /**
+     * Check if columns exist.
+     */
+    public function hasColumns(): bool
+    {
+        return $this->getColumns()->isNotEmpty();
     }
 
     /**
