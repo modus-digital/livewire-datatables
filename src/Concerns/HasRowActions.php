@@ -16,6 +16,8 @@ trait HasRowActions
     /**
      * Define row actions for the table.
      * Override this method in your table class.
+     *
+     * @return RowAction[]
      */
     protected function rowActions(): array
     {
@@ -24,6 +26,8 @@ trait HasRowActions
 
     /**
      * Get all row actions.
+     *
+     * @return Collection<int, RowAction>
      */
     public function getRowActions(): Collection
     {
@@ -54,7 +58,7 @@ trait HasRowActions
             return;
         }
 
-        $callback = $actionConfig?->getCallback();
+        $callback = $actionConfig->getCallback();
         if ($callback instanceof Closure) {
             $record = $this->getModel()->find($id);
             if ($record) {
@@ -73,6 +77,8 @@ trait HasRowActions
 
     /**
      * Get filtered actions for a specific record.
+     *
+     * @return Collection<int, RowAction>
      */
     public function getRecordActions(mixed $record): Collection
     {

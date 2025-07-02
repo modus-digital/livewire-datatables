@@ -56,6 +56,8 @@ abstract class Table extends Component
 
     /**
      * Get the base query for the table.
+     *
+     * @return Builder<Model>
      */
     protected function query(): Builder
     {
@@ -64,6 +66,8 @@ abstract class Table extends Component
 
     /**
      * Get the table data.
+     *
+     * @return Collection<int, Model>|LengthAwarePaginator<Model>
      */
     public function getRows(): Collection|LengthAwarePaginator
     {
@@ -86,6 +90,9 @@ abstract class Table extends Component
 
     /**
      * Apply global search across searchable columns.
+     *
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
      */
     protected function applyGlobalSearch(Builder $query): Builder
     {
@@ -182,7 +189,7 @@ abstract class Table extends Component
     /**
      * Render the component.
      */
-    public function render()
+    public function render(): \Illuminate\Contracts\View\View
     {
         /** @var view-string $view */
         $view = 'livewire-datatables::table';

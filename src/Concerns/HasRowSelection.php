@@ -6,6 +6,7 @@ namespace ModusDigital\LivewireDatatables\Concerns;
 
 trait HasRowSelection
 {
+    /** @var array<int|string> */
     public array $selected = [];
 
     public bool $selectAll = false;
@@ -113,6 +114,8 @@ trait HasRowSelection
 
     /**
      * Get visible row IDs for current page.
+     *
+     * @return array<int|string>
      */
     protected function getVisibleRowIds(): array
     {

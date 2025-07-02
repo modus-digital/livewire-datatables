@@ -46,6 +46,9 @@ trait HasSorting
 
     /**
      * Apply sorting to the query.
+     *
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applySorting(Builder $query): Builder
     {

@@ -32,6 +32,10 @@ class DateFilter extends Filter
         return $this->range;
     }
 
+    /**
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     */
     public function apply(Builder $query, mixed $value): Builder
     {
         if (empty($value)) {

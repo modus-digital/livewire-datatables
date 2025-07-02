@@ -15,6 +15,8 @@ trait HasColumns
     /**
      * Define the columns for the table.
      * Override this method in your table class.
+     *
+     * @return Column[]
      */
     protected function columns(): array
     {
@@ -23,6 +25,8 @@ trait HasColumns
 
     /**
      * Get all columns.
+     *
+     * @return Collection<int, Column>
      */
     public function getColumns(): Collection
     {
@@ -30,23 +34,27 @@ trait HasColumns
             $this->columnCache = $this->columns();
         }
 
-        return collect($this->columnCache)->filter(fn (Column $column) => ! $column->isHidden());
+        return collect($this->columnCache)->filter(fn(Column $column) => ! $column->isHidden());
     }
 
     /**
      * Get searchable columns.
+     *
+     * @return Collection<int, Column>
      */
     public function getSearchableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn (Column $column) => $column->isSearchable());
+        return $this->getColumns()->filter(fn(Column $column) => $column->isSearchable());
     }
 
     /**
      * Get sortable columns.
+     *
+     * @return Collection<int, Column>
      */
     public function getSortableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn (Column $column) => $column->isSortable());
+        return $this->getColumns()->filter(fn(Column $column) => $column->isSortable());
     }
 
     /**
@@ -54,7 +62,7 @@ trait HasColumns
      */
     public function getColumn(string $field): ?Column
     {
-        return $this->getColumns()->first(fn (Column $column) => $column->getField() === $field);
+        return $this->getColumns()->first(fn(Column $column) => $column->getField() === $field);
     }
 
     /**
@@ -84,7 +92,10 @@ trait HasColumns
     {
         $value = $column->getValue($record);
 
-        if ($view = $column->getView()) {
+        /** @var view-string|null $view */
+        $view = $column->getView();
+
+        if ($view) {
             return view($view, [
                 'record' => $record,
                 'value' => $value,

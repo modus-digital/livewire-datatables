@@ -45,6 +45,12 @@ class LivewireDatatablesCommand extends Command
     {
         $segments = preg_split('/[\/\\\\]+/', $rawName);
 
+        if (empty($segments)) {
+            $this->error('Invalid table name provided');
+
+            return false;
+        }
+
         $class = Str::studly(array_pop($segments));
         $subPath = implode(DIRECTORY_SEPARATOR, $segments);
         $basePath = app_path('Livewire/Tables');
