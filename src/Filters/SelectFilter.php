@@ -8,10 +8,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SelectFilter extends Filter
 {
+    /** @var array<string|int, string> */
     protected array $options = [];
 
     protected bool $multiple = false;
 
+    /**
+     * @param  array<string|int, string>  $options
+     */
     public function options(array $options): self
     {
         $this->options = $options;
@@ -26,6 +30,9 @@ class SelectFilter extends Filter
         return $this;
     }
 
+    /**
+     * @return array<string|int, string>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -36,6 +43,10 @@ class SelectFilter extends Filter
         return $this->multiple;
     }
 
+    /**
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     */
     public function apply(Builder $query, mixed $value): Builder
     {
         if (empty($value)) {

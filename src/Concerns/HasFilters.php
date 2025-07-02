@@ -12,6 +12,7 @@ use ModusDigital\LivewireDatatables\Filters\Filter;
 trait HasFilters
 {
     #[Url(as: 'filter')]
+    /** @var array<string, mixed> */
     public array $filters = [];
 
     /** @var Filter[] */
@@ -20,6 +21,8 @@ trait HasFilters
     /**
      * Define the filters for the table.
      * Override this method in your table class.
+     *
+     * @return Filter[]
      */
     protected function filters(): array
     {
@@ -28,6 +31,8 @@ trait HasFilters
 
     /**
      * Get all filters.
+     *
+     * @return Collection<int, Filter>
      */
     public function getFilters(): Collection
     {
@@ -40,6 +45,9 @@ trait HasFilters
 
     /**
      * Apply filters to the query.
+     *
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applyFilters(Builder $query): Builder
     {

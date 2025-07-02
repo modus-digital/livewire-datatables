@@ -2,7 +2,7 @@
     <div x-data="{ actionsOpen: false }" class="relative inline-block text-right" x-cloak>
         {{-- Actions Button --}}
         <button
-            @click="actionsOpen = !actionsOpen"
+            @click.stop="actionsOpen = !actionsOpen"
             class="inline-flex cursor-pointer items-center p-2 text-gray-400 bg-white rounded-full hover:text-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-500 dark:hover:text-gray-300"
         >
             <span class="sr-only">Open options</span>
@@ -26,7 +26,7 @@
             <div class="py-1">
                 @foreach($this->getRecordActions($record) as $action)
                     <button
-                        wire:click="executeRowAction('{{ $action->getKey() }}', {{ $record->id }})"
+                        wire:click.stop="executeRowAction('{{ $action->getKey() }}', {{ $record->id }})"
                         @if($action->getConfirmMessage())
                             onclick="return confirm('{{ $action->getConfirmMessage() }}')"
                         @endif

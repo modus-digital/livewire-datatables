@@ -68,6 +68,10 @@ abstract class Filter
         return $this->placeholder;
     }
 
+    /**
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     */
     abstract public function apply(Builder $query, mixed $value): Builder;
 
     abstract public function render(): string;

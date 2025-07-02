@@ -16,6 +16,7 @@ A reusable, highly-customizable **Livewire Datatable** component for the TALL st
 - 📄 **Pagination** with customizable page sizes
 - ✅ **Row selection** with bulk actions
 - 🔧 **Highly customizable** with traits and concerns
+- 🔭 **Custom cell views** for rendering complex content
 - 🧪 **Fully tested** with Pest 3
 - 📱 **Responsive design** for all screen sizes
 - ♿ **Accessibility features** built-in
@@ -83,7 +84,7 @@ class UsersTable extends Table
 
             TextColumn::make('Status')
                 ->field('status')
-                ->badge()
+                ->badge() // badges span the full cell width by default
                 ->limit(10),
         ];
     }
@@ -117,6 +118,8 @@ The table component builds a query from your model, applies global search, filte
 
 ### Column Configuration
 
+To render complex HTML or even embed a Livewire component, provide a custom view using `->view()`. The view receives the row `record` and the column `value`.
+
 ```php
 Column::make('Avatar')
     ->field('avatar_url')
@@ -147,7 +150,7 @@ protected function columns(): array
             ->count(fn($record) => $record->notifications_count),
 
         TextColumn::make('role')
-            ->badge(fn($record) => $record->role_color),
+            ->badge(fn($record) => $record->role_color), // spans full width
     ];
 }
 ```
@@ -210,6 +213,24 @@ public function rowActionDelete($row)
 {
     $row->delete();
     session()->flash('message', 'User deleted successfully.');
+}
+```
+
+### Clickable Rows
+
+Make the entire row clickable by overriding the `showRecord` method on your table. You can redirect or dispatch a Livewire event from here:
+
+```php
+class UsersTable extends Table
+{
+    public function showRecord($id)
+    {
+        // Redirect to a detail page
+        return redirect()->route('users.show', $id);
+
+        // Or dispatch an event to open a drawer
+        // $this->dispatch('openUserDrawer', id: $id);
+    }
 }
 ```
 

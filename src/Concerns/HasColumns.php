@@ -15,6 +15,8 @@ trait HasColumns
     /**
      * Define the columns for the table.
      * Override this method in your table class.
+     *
+     * @return Column[]
      */
     protected function columns(): array
     {
@@ -23,6 +25,8 @@ trait HasColumns
 
     /**
      * Get all columns.
+     *
+     * @return Collection<int, Column>
      */
     public function getColumns(): Collection
     {
@@ -35,6 +39,8 @@ trait HasColumns
 
     /**
      * Get searchable columns.
+     *
+     * @return Collection<int, Column>
      */
     public function getSearchableColumns(): Collection
     {
@@ -43,6 +49,8 @@ trait HasColumns
 
     /**
      * Get sortable columns.
+     *
+     * @return Collection<int, Column>
      */
     public function getSortableColumns(): Collection
     {
@@ -82,6 +90,18 @@ trait HasColumns
      */
     public function renderCell(Column $column, mixed $record): mixed
     {
-        return $column->getValue($record);
+        $value = $column->getValue($record);
+
+        /** @var view-string|null $view */
+        $view = $column->getView();
+
+        if ($view) {
+            return view($view, [
+                'record' => $record,
+                'value' => $value,
+            ])->render();
+        }
+
+        return $value;
     }
 }

@@ -16,11 +16,15 @@ trait HasPagination
 
     /**
      * Available per page options.
+     *
+     * @var int[]
      */
     protected array $perPageOptions = [10, 25, 50, 100];
 
     /**
      * Get per page options.
+     *
+     * @return int[]
      */
     public function getPerPageOptions(): array
     {

@@ -12,11 +12,17 @@ trait HasActions
     /** @var Action[] */
     protected array $actionsCache = [];
 
+    /**
+     * @return Action[]
+     */
     protected function actions(): array
     {
         return [];
     }
 
+    /**
+     * @return Collection<int, Action>
+     */
     public function getActions(): Collection
     {
         if (empty($this->actionsCache)) {
@@ -34,7 +40,12 @@ trait HasActions
     public function executeAction(string $key): void
     {
         $action = $this->getActions()->first(fn (Action $a) => $a->getKey() === $key);
-        $callback = $action?->getCallback();
+
+        if (! $action) {
+            return;
+        }
+
+        $callback = $action->getCallback();
 
         if ($callback) {
             $callback($this);
