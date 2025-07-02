@@ -61,7 +61,10 @@ it('applies filters to query', function () {
         'status' => 'active',
     ];
 
-    $model = new class extends Model { protected $table = 'test_table'; };
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
     $query = Mockery::mock(Builder::class);
     $query->shouldReceive('getModel')->andReturn($model)->byDefault();
     $query->shouldReceive('where')->twice()->andReturnSelf();
@@ -78,7 +81,10 @@ it('skips empty filter values', function () {
         'email' => [],
     ];
 
-    $model = new class extends Model { protected $table = 'test_table'; };
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
     $query = Mockery::mock(Builder::class);
     $query->shouldReceive('getModel')->andReturn($model)->byDefault();
     $query->shouldNotReceive('where');
