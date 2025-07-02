@@ -30,7 +30,7 @@
                         @if($action->getConfirmMessage())
                             onclick="return confirm('{{ $action->getConfirmMessage() }}')"
                         @endif
-                        class="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 @if($action->getClass()) {{ $action->getClass() }} @else text-gray-700 dark:text-gray-300 @endif"
+                        class="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ $action->getClass() ?: 'text-gray-700 dark:text-gray-300' }}"
                     >
                         @if($action->getIcon())
                             <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
