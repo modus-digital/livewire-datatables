@@ -57,50 +57,39 @@ class SelectFilter extends Filter
             [$relation, $field] = explode('.', $this->field, 2);
 
             return $query->whereHas($relation, function (Builder $q) use ($field, $value) {
+                $relatedTable = $q->getModel()->getTable();
+                $qualifiedField = $relatedTable . '.' . $field;
+
                 if ($this->multiple && is_array($value)) {
-                    $q->whereIn($field, $value);
+                    $q->whereIn($qualifiedField, $value);
                 } else {
-                    $q->where($field, $value);
+                    $q->where($qualifiedField, $value);
                 }
             });
         }
 
-        if ($this->multiple && is_array($value)) {
-            return $query->whereIn($this->field, $value);
+        $field = $this->field;
+        if (! str_contains($field, '.')) {
+            $field = $query->getModel()->getTable() . '.' . $field;
         }
 
-        return $query->where($this->field, $value);
+        if ($this->multiple && is_array($value)) {
+            return $query->whereIn($field, $value);
+        }
+
+        return $query->where($field, $value);
     }
 
     public function render(): string
     {
-        $selectClass = 'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-gray-700 dark:text-white dark:ring-gray-600';
-
-        $multiple = $this->multiple ? 'multiple' : '';
         $placeholder = $this->placeholder ?? "Select {$this->name}";
 
-        $options = '';
-        if (! $this->multiple) {
-            $options .= "<option value=\"\">{$placeholder}</option>";
-        }
-
-        foreach ($this->options as $value => $label) {
-            $options .= "<option value=\"{$value}\">{$label}</option>";
-        }
-
-        return "
-            <div class=\"relative\">
-                <label class=\"block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-1\">
-                    {$this->name}
-                </label>
-                <select
-                    wire:model.live=\"filters.{$this->field}\"
-                    class=\"{$selectClass}\"
-                    {$multiple}
-                >
-                    {$options}
-                </select>
-            </div>
-        ";
+        return view('livewire-datatables::partials.filters.select-filter', [
+            'name' => $this->name,
+            'field' => $this->field,
+            'placeholder' => $placeholder,
+            'options' => $this->options,
+            'multiple' => $this->multiple,
+        ])->render();
     }
 }

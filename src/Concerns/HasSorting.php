@@ -50,7 +50,7 @@ trait HasSorting
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
-    protected function applySorting(Builder $query): Builder
+    public function applySorting(Builder $query): Builder
     {
         $sortField = $this->sortField ?: $this->defaultSortField;
         $sortDirection = $this->sortDirection ?: $this->defaultSortDirection;
@@ -89,6 +89,10 @@ trait HasSorting
 
                 return $query;
             }
+        }
+
+        if (! str_contains($sortField, '.')) {
+            $sortField = $query->getModel()->getTable() . '.' . $sortField;
         }
 
         return $query->orderBy($sortField, $sortDirection);

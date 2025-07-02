@@ -14,7 +14,7 @@ class Action
 
     protected ?string $icon = null;
 
-    protected string $class = 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white';
+    protected string $class = '';
 
     protected ?string $confirmMessage = null;
 
@@ -78,6 +78,11 @@ class Action
     public function getKey(): string
     {
         return $this->key;
+    }
+
+    public function getName(): string
+    {
+        return $this->label;
     }
 
     public function getLabel(): string

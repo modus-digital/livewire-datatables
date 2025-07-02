@@ -13,6 +13,9 @@ trait HasRowActions
     /** @var RowAction[] */
     protected array $rowActionsCache = [];
 
+    /** @var Collection<int, RowAction>|null */
+    protected ?Collection $rowActionsCollection = null;
+
     /**
      * Define row actions for the table.
      * Override this method in your table class.
@@ -33,9 +36,10 @@ trait HasRowActions
     {
         if (empty($this->rowActionsCache)) {
             $this->rowActionsCache = $this->rowActions();
+            $this->rowActionsCollection = collect($this->rowActionsCache);
         }
 
-        return collect($this->rowActionsCache);
+        return $this->rowActionsCollection;
     }
 
     /**

@@ -15,6 +15,8 @@ class Column
 
     protected ?string $relationship = null;
 
+    protected ?string $sortField = null;
+
     protected bool $sortable = false;
 
     protected bool $searchable = false;
@@ -50,6 +52,13 @@ class Column
     public function relationship(string $relationship): self
     {
         $this->relationship = $relationship;
+
+        return $this;
+    }
+
+    public function sortField(string $sortField): self
+    {
+        $this->sortField = $sortField;
 
         return $this;
     }
@@ -176,6 +185,10 @@ class Column
 
     public function getSortField(): string
     {
+        if ($this->sortField) {
+            return $this->sortField;
+        }
+
         if ($this->relationship) {
             return $this->relationship;
         }

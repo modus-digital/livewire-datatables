@@ -43,9 +43,15 @@ class LivewireDatatablesCommand extends Command
      */
     private function createTableFile(Filesystem $files, string $rawName, string $model): bool
     {
+        if (empty(trim($rawName))) {
+            $this->error('Invalid table name provided');
+
+            return false;
+        }
+
         $segments = preg_split('/[\/\\\\]+/', $rawName);
 
-        if (empty($segments)) {
+        if (empty($segments) || (count($segments) === 1 && empty($segments[0]))) {
             $this->error('Invalid table name provided');
 
             return false;
@@ -66,8 +72,8 @@ class LivewireDatatablesCommand extends Command
         $namespaceSuffix = $segments ? '\\' . implode('\\', array_map([Str::class, 'studly'], $segments)) : '';
 
         $namespace = Str::contains($namespaceSuffix, 'Tables')
-            ? 'App\\Livewire\\Tables' . $namespaceSuffix
-            : 'App\\Livewire' . $namespaceSuffix;
+            ? 'App\\Livewire' . $namespaceSuffix
+            : 'App\\Livewire\\Tables' . $namespaceSuffix;
 
         $stub = $files->get(__DIR__ . '/../../resources/stubs/component.stub');
 
