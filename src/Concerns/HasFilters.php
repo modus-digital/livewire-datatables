@@ -94,7 +94,7 @@ trait HasFilters
      */
     public function hasActiveFilters(): bool
     {
-        return ! empty(array_filter($this->getFilterValues(), fn($value) => $value !== null && $value !== '' && $value !== []));
+        return ! empty(array_filter($this->getFilterValues(), fn ($value) => $value !== null && $value !== '' && $value !== []));
     }
 
     /**
@@ -102,7 +102,7 @@ trait HasFilters
      */
     public function getActiveFilterCount(): int
     {
-        return count(array_filter($this->getFilterValues(), fn($value) => $value !== null && $value !== '' && $value !== []));
+        return count(array_filter($this->getFilterValues(), fn ($value) => $value !== null && $value !== '' && $value !== []));
     }
 
     /**
