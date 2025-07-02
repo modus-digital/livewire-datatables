@@ -75,6 +75,32 @@ it('handles relationship field with single value', function () {
     $filter->apply($query, 'active');
 });
 
+it('properly qualifies relationship field in whereHas closure', function () {
+    $filter = SelectFilter::make('Client Status')->field('client.status');
+
+    // Create a more detailed mock that can verify the closure behavior
+    $query = createMockQueryForSelectFilter();
+
+    $query->shouldReceive('whereHas')->once()->with('client', Mockery::on(function ($closure) {
+        // Create a mock for the sub-query within the whereHas closure
+        $relatedModel = new class extends Model
+        {
+            protected $table = 'clients';
+        };
+
+        $subQuery = Mockery::mock(Builder::class);
+        $subQuery->shouldReceive('getModel')->andReturn($relatedModel);
+        $subQuery->shouldReceive('where')->once()->with('clients.status', 'active')->andReturnSelf();
+
+        // Execute the closure to verify it calls the right methods
+        $closure($subQuery);
+
+        return true;
+    }))->andReturnSelf();
+
+    $filter->apply($query, 'active');
+});
+
 it('handles relationship field with multiple values', function () {
     $filter = SelectFilter::make('User Status')->field('user.status')->multiple();
 
