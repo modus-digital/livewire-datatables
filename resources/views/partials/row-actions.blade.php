@@ -26,7 +26,7 @@
             <div class="py-1">
                 @foreach($this->getRecordActions($record) as $action)
                     <button
-                        wire:click="executeRowAction('{{ $action->getKey() }}', {{ $record->id }})"
+                        wire:click.stop="executeRowAction('{{ $action->getKey() }}', {{ $record->id }})"
                         @if($action->getConfirmMessage())
                             onclick="return confirm('{{ $action->getConfirmMessage() }}')"
                         @endif

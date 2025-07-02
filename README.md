@@ -216,6 +216,24 @@ public function rowActionDelete($row)
 }
 ```
 
+### Clickable Rows
+
+Make the entire row clickable by overriding the `showRecord` method on your table. You can redirect or dispatch a Livewire event from here:
+
+```php
+class UsersTable extends Table
+{
+    public function showRecord($id)
+    {
+        // Redirect to a detail page
+        return redirect()->route('users.show', $id);
+
+        // Or dispatch an event to open a drawer
+        // $this->dispatch('openUserDrawer', id: $id);
+    }
+}
+```
+
 ### Global Actions
 
 ```php

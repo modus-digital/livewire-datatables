@@ -32,7 +32,7 @@ class Column
     public function __construct(string $name)
     {
         $this->name = Str::headline($name);
-        $this->field = $name;
+        $this->field = Str::snake($name);
     }
 
     public static function make(string $name): static
