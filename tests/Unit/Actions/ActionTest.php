@@ -64,7 +64,7 @@ it('is visible by default', function () {
 });
 
 it('sets visibility condition as closure', function () {
-    $action = Action::make('export', 'Export')->visible(fn($record) => $record === 'admin');
+    $action = Action::make('export', 'Export')->visible(fn ($record) => $record === 'admin');
 
     expect($action->isVisible('admin'))->toBeTrue()
         ->and($action->isVisible('user'))->toBeFalse();
@@ -95,7 +95,7 @@ it('chains methods fluently', function () {
         ->class('btn-primary')
         ->confirm('Export data?')
         ->visible(true)
-        ->callback(fn() => null);
+        ->callback(fn () => null);
 
     expect($action->getLabel())->toBe('Export All')
         ->and($action->getIcon())->toBe('download')
