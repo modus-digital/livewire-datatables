@@ -91,6 +91,10 @@ trait HasSorting
             }
         }
 
+        if (! str_contains($sortField, '.')) {
+            $sortField = $query->getModel()->getTable() . '.' . $sortField;
+        }
+
         return $query->orderBy($sortField, $sortDirection);
     }
 

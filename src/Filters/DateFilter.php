@@ -56,11 +56,16 @@ class DateFilter extends Filter
                 });
             }
 
+            $field = $this->field;
+            if (! str_contains($field, '.')) {
+                $field = $query->getModel()->getTable() . '.' . $field;
+            }
+
             if (! empty($value['from'])) {
-                $query->where($this->field, '>=', Carbon::parse($value['from'])->startOfDay());
+                $query->where($field, '>=', Carbon::parse($value['from'])->startOfDay());
             }
             if (! empty($value['to'])) {
-                $query->where($this->field, '<=', Carbon::parse($value['to'])->endOfDay());
+                $query->where($field, '<=', Carbon::parse($value['to'])->endOfDay());
             }
 
             return $query;
@@ -72,7 +77,12 @@ class DateFilter extends Filter
             return $query->whereHas($relation, fn (Builder $q) => $q->whereDate($field, Carbon::parse($value)));
         }
 
-        return $query->whereDate($this->field, Carbon::parse($value));
+        $field = $this->field;
+        if (! str_contains($field, '.')) {
+            $field = $query->getModel()->getTable() . '.' . $field;
+        }
+
+        return $query->whereDate($field, Carbon::parse($value));
     }
 
     public function render(): string

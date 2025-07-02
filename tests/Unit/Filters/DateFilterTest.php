@@ -2,12 +2,21 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use ModusDigital\LivewireDatatables\Filters\DateFilter;
 
 // Helper function to create mock query
 function createMockQueryForDateFilter(): Builder
 {
-    return Mockery::mock(Builder::class);
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
+
+    $mock = Mockery::mock(Builder::class);
+    $mock->shouldReceive('getModel')->andReturn($model)->byDefault();
+
+    return $mock;
 }
 
 beforeEach(function () {
@@ -50,7 +59,7 @@ it('sets custom format', function () {
 
 it('applies single date filter', function () {
     $query = createMockQueryForDateFilter();
-    $query->shouldReceive('whereDate')->once()->with('created_at', Mockery::type(Carbon::class))->andReturnSelf();
+    $query->shouldReceive('whereDate')->once()->with('test_table.created_at', Mockery::type(Carbon::class))->andReturnSelf();
 
     $this->filter->apply($query, '2024-01-01');
 });
@@ -68,7 +77,7 @@ it('applies partial date range filter with only from date', function () {
     $filter = DateFilter::make('Created At')->range();
 
     $query = createMockQueryForDateFilter();
-    $query->shouldReceive('where')->once()->with('created_at', '>=', Mockery::type(Carbon::class))->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.created_at', '>=', Mockery::type(Carbon::class))->andReturnSelf();
 
     $filter->apply($query, ['from' => '2024-01-01']);
 });
@@ -77,7 +86,7 @@ it('applies partial date range filter with only to date', function () {
     $filter = DateFilter::make('Created At')->range();
 
     $query = createMockQueryForDateFilter();
-    $query->shouldReceive('where')->once()->with('created_at', '<=', Mockery::type(Carbon::class))->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.created_at', '<=', Mockery::type(Carbon::class))->andReturnSelf();
 
     $filter->apply($query, ['to' => '2024-01-31']);
 });

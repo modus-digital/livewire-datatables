@@ -117,6 +117,10 @@ abstract class Table extends Component
                         $subQuery->where($relationField, 'like', "%{$this->search}%");
                     });
                 } else {
+                    if (! str_contains($field, '.')) {
+                        $field = $query->getModel()->getTable() . '.' . $field;
+                    }
+
                     $query->orWhere($field, 'like', "%{$this->search}%");
                 }
             }

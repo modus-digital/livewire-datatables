@@ -1,12 +1,21 @@
 <?php
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use ModusDigital\LivewireDatatables\Filters\SelectFilter;
 
 // Helper function to create mock query
 function createMockQueryForSelectFilter(): Builder
 {
-    return Mockery::mock(Builder::class);
+    $model = new class extends Model
+    {
+        protected $table = 'test_table';
+    };
+
+    $mock = Mockery::mock(Builder::class);
+    $mock->shouldReceive('getModel')->andReturn($model)->byDefault();
+
+    return $mock;
 }
 
 beforeEach(function () {
@@ -43,7 +52,7 @@ it('is not multiple by default', function () {
 
 it('applies single value filter', function () {
     $query = createMockQueryForSelectFilter();
-    $query->shouldReceive('where')->once()->with('status', 'active')->andReturnSelf();
+    $query->shouldReceive('where')->once()->with('test_table.status', 'active')->andReturnSelf();
 
     $this->filter->apply($query, 'active');
 });
@@ -52,7 +61,7 @@ it('applies multiple values filter', function () {
     $filter = SelectFilter::make('Status')->multiple();
 
     $query = createMockQueryForSelectFilter();
-    $query->shouldReceive('whereIn')->once()->with('status', ['active', 'pending'])->andReturnSelf();
+    $query->shouldReceive('whereIn')->once()->with('test_table.status', ['active', 'pending'])->andReturnSelf();
 
     $filter->apply($query, ['active', 'pending']);
 });
