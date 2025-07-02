@@ -159,6 +159,27 @@ abstract class Table extends Component
     }
 
     /**
+     * Determine if the table has an override for the row click handler.
+     */
+    protected function hasShowRecord(): bool
+    {
+        $method = new \ReflectionMethod($this, 'showRecord');
+
+        return $method->getDeclaringClass()->getName() !== self::class;
+    }
+
+    /**
+     * Handle clicking on a row. Override in your table component.
+     *
+     * Typical implementations may redirect to a route or dispatch a Livewire
+     * event with the selected record ID.
+     */
+    public function showRecord(string|int $id): void
+    {
+        // Override in your table to define row click behaviour.
+    }
+
+    /**
      * Render the component.
      */
     public function render()
