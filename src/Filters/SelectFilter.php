@@ -57,10 +57,13 @@ class SelectFilter extends Filter
             [$relation, $field] = explode('.', $this->field, 2);
 
             return $query->whereHas($relation, function (Builder $q) use ($field, $value) {
+                $relatedTable = $q->getModel()->getTable();
+                $qualifiedField = $relatedTable . '.' . $field;
+
                 if ($this->multiple && is_array($value)) {
-                    $q->whereIn($field, $value);
+                    $q->whereIn($qualifiedField, $value);
                 } else {
-                    $q->where($field, $value);
+                    $q->where($qualifiedField, $value);
                 }
             });
         }
