@@ -2,6 +2,16 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.2.0 - 2025-07-02
+
+### What's Changed
+
+* Enhance datatable rendering and relation sorting by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/14
+* Implement clickable rows by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/15
+* Fix ambiguous column names in queries by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/17
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.1.4...1.2.0
+
 ## 1.1.4 - 2025-06-18
 
 ### What's Changed
