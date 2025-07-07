@@ -110,10 +110,12 @@ abstract class Table extends Component
                 $field = $column->getField();
 
                 if ($column->getRelationship()) {
-                    // Handle relationship search
-                    $relation = explode('.', $column->getRelationship())[0];
-                    $query->orWhereHas($relation, function (Builder $subQuery) use ($column) {
-                        $relationField = last(explode('.', $column->getRelationship()));
+                    // Handle relationship search (supports nested relations)
+                    $parts = explode('.', $column->getRelationship());
+                    $relationField = array_pop($parts);
+                    $relation = implode('.', $parts);
+
+                    $query->orWhereHas($relation, function (Builder $subQuery) use ($relationField) {
                         $subQuery->where($relationField, 'like', "%{$this->search}%");
                     });
                 } else {

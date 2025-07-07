@@ -67,25 +67,34 @@ trait HasSorting
 
         if ($relationship) {
             $parts = explode('.', $relationship);
+            if (count($parts) >= 2) {
+                $relationField = array_pop($parts);
 
-            if (count($parts) === 2) {
-                [$relationName, $relationField] = $parts;
                 $model = $this->getModel();
-                $relationInstance = $model->{$relationName}();
-                $relationTable = $relationInstance->getRelated()->getTable();
+                $baseTable = $model->getTable();
+                $previousAlias = $baseTable;
 
-                if ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
-                    $foreignKey = $relationInstance->getForeignKeyName();
-                    $ownerKey = $relationInstance->getOwnerKeyName();
-                    $query->leftJoin($relationTable, $model->getTable() . '.' . $foreignKey, '=', $relationTable . '.' . $ownerKey);
-                } elseif ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasOne || $relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
-                    $foreignKey = $relationInstance->getForeignKeyName();
-                    $localKey = $relationInstance->getLocalKeyName();
-                    $query->leftJoin($relationTable, $relationTable . '.' . $foreignKey, '=', $model->getTable() . '.' . $localKey);
+                foreach ($parts as $index => $relationName) {
+                    $relationInstance = $model->{$relationName}();
+                    $relationTable = $relationInstance->getRelated()->getTable();
+                    $alias = 'lwd_sort_' . $index;
+
+                    if ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
+                        $foreignKey = $relationInstance->getForeignKeyName();
+                        $ownerKey = $relationInstance->getOwnerKeyName();
+                        $query->leftJoin("{$relationTable} as {$alias}", "{$previousAlias}.{$foreignKey}", '=', "{$alias}.{$ownerKey}");
+                    } elseif ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasOne || $relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
+                        $foreignKey = $relationInstance->getForeignKeyName();
+                        $localKey = $relationInstance->getLocalKeyName();
+                        $query->leftJoin("{$relationTable} as {$alias}", "{$alias}.{$foreignKey}", '=', "{$previousAlias}.{$localKey}");
+                    }
+
+                    $previousAlias = $alias;
+                    $model = $relationInstance->getRelated();
                 }
 
-                $query->orderBy("{$relationTable}.{$relationField}", $sortDirection)
-                    ->select($model->getTable() . '.*');
+                $query->orderBy("{$previousAlias}.{$relationField}", $sortDirection)
+                    ->select($baseTable . '.*');
 
                 return $query;
             }

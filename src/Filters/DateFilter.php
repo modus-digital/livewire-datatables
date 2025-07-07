@@ -44,7 +44,9 @@ class DateFilter extends Filter
 
         if ($this->range && is_array($value)) {
             if (str_contains($this->field, '.')) {
-                [$relation, $field] = explode('.', $this->field, 2);
+                $parts = explode('.', $this->field);
+                $field = array_pop($parts);
+                $relation = implode('.', $parts);
 
                 return $query->whereHas($relation, function (Builder $q) use ($field, $value) {
                     if (! empty($value['from'])) {
@@ -72,7 +74,9 @@ class DateFilter extends Filter
         }
 
         if (str_contains($this->field, '.')) {
-            [$relation, $field] = explode('.', $this->field, 2);
+            $parts = explode('.', $this->field);
+            $field = array_pop($parts);
+            $relation = implode('.', $parts);
 
             return $query->whereHas($relation, fn (Builder $q) => $q->whereDate($field, Carbon::parse($value)));
         }
