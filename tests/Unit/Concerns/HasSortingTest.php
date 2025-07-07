@@ -222,7 +222,7 @@ it('applies sorting for nested relationship paths', function () {
     $query = Mockery::mock(Builder::class);
     $query->shouldReceive('getModel')->andReturn($model)->byDefault();
     $query->shouldReceive('leftJoin')->once()->with('users as lwd_sort_0', 'posts.user_id', '=', 'lwd_sort_0.id')->andReturnSelf();
-    $query->shouldReceive('leftJoin')->once()->with('profiles as lwd_sort_1', 'lwd_sort_1.user_id', '=', 'lwd_sort_0.id')->andReturnSelf();
+    $query->shouldReceive('leftJoin')->once()->with('profiles as lwd_sort_1', 'lwd_sort_0.id', '=', 'lwd_sort_1.user_id')->andReturnSelf();
     $query->shouldReceive('orderBy')->once()->with('lwd_sort_1.name', 'asc')->andReturnSelf();
     $query->shouldReceive('select')->once()->with('posts.*')->andReturnSelf();
 
