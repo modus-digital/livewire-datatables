@@ -177,22 +177,26 @@ it('does not override existing sorting during initialization', function () {
 });
 
 it('applies sorting for nested relationship paths', function () {
-    $component = new class {
+    $component = new class
+    {
         use HasSorting;
 
         public function getModel(): Model
         {
-            return new class extends Model {
+            return new class extends Model
+            {
                 protected $table = 'posts';
 
                 public function user()
                 {
-                    return $this->belongsTo(new class extends Model {
+                    return $this->belongsTo(new class extends Model
+                    {
                         protected $table = 'users';
 
                         public function profile()
                         {
-                            return $this->hasOne(new class extends Model {
+                            return $this->hasOne(new class extends Model
+                            {
                                 protected $table = 'profiles';
                             }, 'user_id', 'id');
                         }
