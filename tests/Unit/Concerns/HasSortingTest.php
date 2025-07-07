@@ -175,3 +175,54 @@ it('does not override existing sorting during initialization', function () {
     expect($this->component->sortField)->toBe('name')
         ->and($this->component->sortDirection)->toBe('desc');
 });
+
+it('applies sorting for nested relationship paths', function () {
+    $component = new class {
+        use HasSorting;
+
+        public function getModel(): Model
+        {
+            return new class extends Model {
+                protected $table = 'posts';
+
+                public function user()
+                {
+                    return $this->belongsTo(new class extends Model {
+                        protected $table = 'users';
+
+                        public function profile()
+                        {
+                            return $this->hasOne(new class extends Model {
+                                protected $table = 'profiles';
+                            }, 'user_id', 'id');
+                        }
+                    }, 'user_id');
+                }
+            };
+        }
+
+        public function isColumnSortable(string $field): bool
+        {
+            return $field === 'user.profile.name';
+        }
+
+        public function getColumn(string $field): ?TextColumn
+        {
+            return TextColumn::make('Profile Name')->relationship('user.profile.name');
+        }
+    };
+
+    $component->sortField = 'user.profile.name';
+    $model = $component->getModel();
+
+    $query = Mockery::mock(Builder::class);
+    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
+    $query->shouldReceive('leftJoin')->once()->with('users as lwd_sort_0', 'posts.user_id', '=', 'lwd_sort_0.id')->andReturnSelf();
+    $query->shouldReceive('leftJoin')->once()->with('profiles as lwd_sort_1', 'lwd_sort_0.id', '=', 'lwd_sort_1.user_id')->andReturnSelf();
+    $query->shouldReceive('orderBy')->once()->with('lwd_sort_1.name', 'asc')->andReturnSelf();
+    $query->shouldReceive('select')->once()->with('posts.*')->andReturnSelf();
+
+    $result = $component->applySorting($query);
+
+    expect($result)->toBe($query);
+});
