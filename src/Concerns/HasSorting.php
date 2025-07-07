@@ -86,7 +86,7 @@ trait HasSorting
                     } elseif ($relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasOne || $relationInstance instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
                         $foreignKey = $relationInstance->getForeignKeyName();
                         $localKey = $relationInstance->getLocalKeyName();
-                        $query->leftJoin("{$relationTable} as {$alias}", "{$alias}.{$foreignKey}", '=', "{$previousAlias}.{$localKey}");
+                        $query->leftJoin("{$relationTable} as {$alias}", "{$previousAlias}.{$localKey}", '=', "{$alias}.{$foreignKey}");
                     }
 
                     $previousAlias = $alias;
