@@ -10,6 +10,16 @@ class TextFilter extends Filter
 {
     protected string $operator = 'like';
 
+    /**
+     * Flag to indicate if current filtering requires attribute-based filtering.
+     */
+    protected bool $requiresAttributeFiltering = false;
+
+    /**
+     * Store the attribute filtering details for later use.
+     */
+    protected array $attributeFilterDetails = [];
+
     public function exact(): self
     {
         $this->operator = '=';
@@ -39,11 +49,39 @@ class TextFilter extends Filter
     }
 
     /**
+     * Check if current filtering requires attribute-based filtering.
+     */
+    public function requiresAttributeFiltering(): bool
+    {
+        return $this->requiresAttributeFiltering;
+    }
+
+    /**
+     * Get the attribute filtering details.
+     */
+    public function getAttributeFilterDetails(): array
+    {
+        return $this->attributeFilterDetails;
+    }
+
+    /**
+     * Reset the attribute filtering state.
+     */
+    public function resetAttributeFiltering(): void
+    {
+        $this->requiresAttributeFiltering = false;
+        $this->attributeFilterDetails = [];
+    }
+
+    /**
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     public function apply(Builder $query, mixed $value): Builder
     {
+        // Reset attribute filtering state
+        $this->resetAttributeFiltering();
+
         if (empty($value)) {
             return $query;
         }
@@ -102,37 +140,27 @@ class TextFilter extends Filter
 
     /**
      * Apply filter to a model attribute.
-     * Since we can't reliably filter model attributes in SQL, this is a best-effort approach.
+     * Set flag to indicate that attribute filtering is needed.
      *
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applyAttributeFilter(Builder $query, string $relation, string $attributeField, \Illuminate\Database\Eloquent\Model $relatedModel, mixed $value): Builder
     {
-        // For model attributes, we can't reliably filter in SQL
-        // We'll fall back to a best-effort approach using common field patterns
-        return $query->whereHas($relation, function (Builder $subQuery) use ($value) {
-            // Try common field patterns that might be used in attributes
-            $commonFields = ['name', 'title', 'description', 'first_name', 'last_name'];
-            $subQuery->where(function (Builder $q) use ($commonFields, $value) {
-                foreach ($commonFields as $field) {
-                    if ($q->getModel()->getConnection()->getSchemaBuilder()->hasColumn($q->getModel()->getTable(), $field)) {
-                        $searchValue = match ($this->operator) {
-                            '=' => $value,
-                            'starts_with' => "{$value}%",
-                            'ends_with' => "%{$value}",
-                            default => "%{$value}%",
-                        };
+        // Set flag to indicate that attribute filtering is needed
+        $this->requiresAttributeFiltering = true;
 
-                        if ($this->operator === '=') {
-                            $q->orWhere($field, '=', $searchValue);
-                        } else {
-                            $q->orWhere($field, 'like', $searchValue);
-                        }
-                    }
-                }
-            });
-        });
+        // Store the filtering details for later use
+        $this->attributeFilterDetails = [
+            'relation' => $relation,
+            'field' => $attributeField,
+            'value' => $value,
+            'operator' => $this->operator,
+            'filter_field' => $this->field,
+        ];
+
+        // Return the query unchanged - the Table class will handle the filtering
+        return $query;
     }
 
     /**
