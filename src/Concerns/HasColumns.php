@@ -116,4 +116,81 @@ trait HasColumns
 
         return $value;
     }
+
+    /**
+     * Check if a field is a model attribute (accessor) rather than a database column.
+     */
+    protected function isModelAttribute(\Illuminate\Database\Eloquent\Model $model, string $field): bool
+    {
+        // Check if it's an accessor method
+        $accessorMethod = 'get' . \Illuminate\Support\Str::studly($field) . 'Attribute';
+        if (method_exists($model, $accessorMethod)) {
+            return true;
+        }
+
+        // Check if it's defined in the model's $appends array
+        if (in_array($field, $model->getAppends())) {
+            return true;
+        }
+
+        // Check if it's a cast attribute
+        if (array_key_exists($field, $model->getCasts())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if model has specific database columns.
+     */
+    protected function hasModelColumns(\Illuminate\Database\Eloquent\Model $model, array $columns): bool
+    {
+        $schema = \Illuminate\Support\Facades\Schema::connection($model->getConnectionName());
+        $tableColumns = $schema->getColumnListing($model->getTable());
+
+        return empty(array_diff($columns, $tableColumns));
+    }
+
+    /**
+     * Get the related model for a relationship field.
+     */
+    protected function getRelatedModel(string $relationshipPath): ?\Illuminate\Database\Eloquent\Model
+    {
+        $parts = explode('.', $relationshipPath);
+        if (count($parts) < 2) {
+            return null;
+        }
+
+        $model = $this->getModel();
+        $relationName = $parts[0];
+
+        if (! method_exists($model, $relationName)) {
+            return null;
+        }
+
+        $relation = $model->{$relationName}();
+
+        return $relation->getRelated();
+    }
+
+    /**
+     * Get the value of a model attribute dynamically.
+     * This works for any Laravel model attribute (accessor, appended, cast, etc.).
+     */
+    protected function getModelAttributeValue(\Illuminate\Database\Eloquent\Model $model, string $attribute): mixed
+    {
+        return $model->getAttribute($attribute);
+    }
+
+    /**
+     * Check if a field is a database column (not an attribute).
+     */
+    protected function isDatabaseColumn(\Illuminate\Database\Eloquent\Model $model, string $field): bool
+    {
+        $schema = \Illuminate\Support\Facades\Schema::connection($model->getConnectionName());
+        $tableColumns = $schema->getColumnListing($model->getTable());
+
+        return in_array($field, $tableColumns);
+    }
 }
