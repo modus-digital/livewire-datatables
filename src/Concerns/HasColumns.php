@@ -35,7 +35,7 @@ trait HasColumns
     {
         if (empty($this->columnCache)) {
             $this->columnCache = $this->columns();
-            $this->columnsCollection = collect($this->columnCache)->filter(fn (Column $column) => ! $column->isHidden());
+            $this->columnsCollection = collect($this->columnCache)->filter(fn(Column $column) => ! $column->isHidden());
         }
 
         return $this->columnsCollection;
@@ -48,7 +48,7 @@ trait HasColumns
      */
     public function getSearchableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn (Column $column) => $column->isSearchable());
+        return $this->getColumns()->filter(fn(Column $column) => $column->isSearchable());
     }
 
     /**
@@ -58,7 +58,7 @@ trait HasColumns
      */
     public function getSortableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn (Column $column) => $column->isSortable());
+        return $this->getColumns()->filter(fn(Column $column) => $column->isSortable());
     }
 
     /**
@@ -66,7 +66,15 @@ trait HasColumns
      */
     public function getColumn(string $field): ?Column
     {
-        return $this->getColumns()->first(fn (Column $column) => $column->getField() === $field);
+        // First try to find by exact field match
+        $column = $this->getColumns()->first(fn(Column $column) => $column->getField() === $field);
+
+        if ($column) {
+            return $column;
+        }
+
+        // If not found, try to find by relationship match
+        return $this->getColumns()->first(fn(Column $column) => $column->getRelationship() === $field);
     }
 
     /**

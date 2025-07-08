@@ -109,6 +109,12 @@ trait HasSorting
         if (count($parts) === 2) {
             [$relationName, $relationField] = $parts;
             $model = $this->getModel();
+
+            // Check if the relation method exists
+            if (! method_exists($model, $relationName)) {
+                return $query;
+            }
+
             $relationInstance = $model->{$relationName}();
             $relationTable = $relationInstance->getRelated()->getTable();
 
