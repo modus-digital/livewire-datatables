@@ -78,24 +78,34 @@ abstract class Table extends Component
             $query = $this->applyGlobalSearch($query);
         }
 
-        // Apply filters
+        // Apply filters first to determine if attribute filtering is needed
         $query = $this->applyFilters($query);
 
-        // Check if we need to sort by a model attribute
-        $needsAttributeSorting = $this->needsAttributeSorting();
+        // Apply sorting to determine if attribute sorting is needed
+        $query = $this->applySorting($query);
 
-        if ($needsAttributeSorting) {
-            // For attribute sorting, we need to get all results and sort in PHP
+        // Check if we need to handle attributes in PHP
+        $needsAttributeSorting = $this->requiresAttributeSorting();
+        $needsAttributeFiltering = $this->requiresAttributeFiltering();
+
+        if ($needsAttributeSorting || $needsAttributeFiltering) {
+            // For attribute operations, we need to get all results and process in PHP
             $results = $query->get();
-            $sortedResults = $this->sortByAttribute($results);
 
-            // Manual pagination for attribute sorting
-            return $this->paginateCollection($sortedResults);
+            // Apply attribute filtering if needed
+            if ($needsAttributeFiltering) {
+                $results = $this->filterByAttributes($results);
+            }
+
+            // Apply attribute sorting if needed
+            if ($needsAttributeSorting) {
+                $results = $this->sortByAttribute($results);
+            }
+
+            // Manual pagination for attribute operations
+            return $this->paginateCollection($results);
         } else {
-            // Apply database sorting
-            $query = $this->applySorting($query);
-
-            // Return paginated results
+            // Return paginated results (sorting and filtering already applied)
             return $query->paginate($this->perPage);
         }
     }
@@ -192,30 +202,78 @@ abstract class Table extends Component
 
     /**
      * Check if current sorting requires attribute sorting (PHP-based).
+     * This method is now a wrapper around the HasSorting trait's requiresAttributeSorting method.
      */
     protected function needsAttributeSorting(): bool
     {
-        if (empty($this->sortField)) {
+        // Apply sorting to determine if attribute sorting is needed
+        $query = $this->query();
+        $this->applySorting($query);
+
+        return $this->requiresAttributeSorting();
+    }
+
+    /**
+     * Filter a collection by model attributes.
+     *
+     * @param  Collection<int, Model>  $collection
+     * @return Collection<int, Model>
+     */
+    protected function filterByAttributes(Collection $collection): Collection
+    {
+        $attributeFilters = $this->getActiveAttributeFilters();
+
+        if (empty($attributeFilters)) {
+            return $collection;
+        }
+
+        return $collection->filter(function ($model) use ($attributeFilters) {
+            foreach ($attributeFilters as $filterDetails) {
+                $relationName = $filterDetails['relation'];
+                $attributeField = $filterDetails['field'];
+                $filterValue = $filterDetails['value'];
+                $operator = $filterDetails['operator'] ?? 'like';
+                $multiple = $filterDetails['multiple'] ?? false;
+
+                $relatedModel = $model->{$relationName};
+                if (! $relatedModel) {
+                    return false;
+                }
+
+                $attributeValue = $this->getModelAttributeValue($relatedModel, $attributeField);
+
+                // Apply the filter based on operator
+                if (! $this->matchesAttributeFilter($attributeValue, $filterValue, $operator, $multiple)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * Check if an attribute value matches the filter criteria.
+     */
+    protected function matchesAttributeFilter(mixed $attributeValue, mixed $filterValue, string $operator, bool $multiple): bool
+    {
+        if ($attributeValue === null) {
             return false;
         }
 
-        // Check if sorting by a relationship field
-        if (str_contains($this->sortField, '.')) {
-            $parts = explode('.', $this->sortField);
-            if (count($parts) === 2) {
-                [$relationName, $relationField] = $parts;
-                $model = $this->getModel();
+        $attributeString = (string) $attributeValue;
 
-                if (method_exists($model, $relationName)) {
-                    $relationInstance = $model->{$relationName}();
-                    $relatedModel = $relationInstance->getRelated();
-
-                    return $this->isModelAttribute($relatedModel, $relationField);
-                }
-            }
+        if ($multiple && is_array($filterValue)) {
+            return in_array($attributeValue, $filterValue);
         }
 
-        return false;
+        return match ($operator) {
+            '=' => $attributeString === (string) $filterValue,
+            'like' => str_contains(strtolower($attributeString), strtolower((string) $filterValue)),
+            'starts_with' => str_starts_with(strtolower($attributeString), strtolower((string) $filterValue)),
+            'ends_with' => str_ends_with(strtolower($attributeString), strtolower((string) $filterValue)),
+            default => str_contains(strtolower($attributeString), strtolower((string) $filterValue)),
+        };
     }
 
     /**
