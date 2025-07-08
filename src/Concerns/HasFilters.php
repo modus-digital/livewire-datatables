@@ -56,11 +56,7 @@ trait HasFilters
     public function applyFilters(Builder $query): Builder
     {
         foreach ($this->getFilters() as $filter) {
-            $field = $filter->getField();
-
-            // Handle dotted field names (e.g., 'client.status') by using data_get
-            // which can access nested array values like $filters['client']['status']
-            $value = data_get($this->filters, $field);
+            $value = $this->getFilterValue($filter->getField());
 
             if ($value !== null && $value !== '' && $value !== []) {
                 $query = $filter->apply($query, $value);
@@ -68,6 +64,64 @@ trait HasFilters
         }
 
         return $query;
+    }
+
+    /**
+     * Get the filter value for a given field.
+     */
+    protected function getFilterValue(string $field): mixed
+    {
+        // Handle dotted field names (e.g., 'client.status') by using data_get
+        // which can access nested array values like $filters['client']['status']
+        return data_get($this->filters, $field);
+    }
+
+    /**
+     * Check if any filter requires attribute-based filtering.
+     */
+    public function requiresAttributeFiltering(): bool
+    {
+        foreach ($this->getFilters() as $filter) {
+            $value = $this->getFilterValue($filter->getField());
+
+            if ($value !== null && $value !== '' && $value !== []) {
+                // Apply the filter to check if it requires attribute filtering
+                $dummyQuery = $this->getModel()->newQuery();
+                $filter->apply($dummyQuery, $value);
+
+                if (method_exists($filter, 'requiresAttributeFiltering') && $filter->requiresAttributeFiltering()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all active attribute filters.
+     */
+    public function getActiveAttributeFilters(): array
+    {
+        $attributeFilters = [];
+
+        foreach ($this->getFilters() as $filter) {
+            $value = $this->getFilterValue($filter->getField());
+
+            if ($value !== null && $value !== '' && $value !== []) {
+                // Apply the filter to check if it requires attribute filtering
+                $dummyQuery = $this->getModel()->newQuery();
+                $filter->apply($dummyQuery, $value);
+
+                if (method_exists($filter, 'requiresAttributeFiltering') && $filter->requiresAttributeFiltering()) {
+                    $details = $filter->getAttributeFilterDetails();
+                    $details['filter_instance'] = $filter;
+                    $attributeFilters[] = $details;
+                }
+            }
+        }
+
+        return $attributeFilters;
     }
 
     /**

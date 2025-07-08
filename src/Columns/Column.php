@@ -17,6 +17,8 @@ class Column
 
     protected ?string $sortField = null;
 
+    protected ?Closure $sortCallback = null;
+
     protected bool $sortable = false;
 
     protected bool $searchable = false;
@@ -59,6 +61,13 @@ class Column
     public function sortField(string $sortField): self
     {
         $this->sortField = $sortField;
+
+        return $this;
+    }
+
+    public function sortUsing(Closure $callback): self
+    {
+        $this->sortCallback = $callback;
 
         return $this;
     }
@@ -194,5 +203,15 @@ class Column
         }
 
         return $this->getField();
+    }
+
+    public function getSortCallback(): ?Closure
+    {
+        return $this->sortCallback;
+    }
+
+    public function hasSortCallback(): bool
+    {
+        return $this->sortCallback !== null;
     }
 }

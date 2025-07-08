@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Model;
 use ModusDigital\LivewireDatatables\Columns\IconColumn;
 use ModusDigital\LivewireDatatables\Columns\TextColumn;
 use ModusDigital\LivewireDatatables\Concerns\HasColumns;
@@ -70,10 +71,67 @@ it('finds column by field', function () {
 });
 
 it('finds column by custom field', function () {
-    $column = $this->component->getColumn('created_at');
+    $column = TextColumn::make('Custom')->field('custom_field');
 
-    expect($column)->toBeInstanceOf(TextColumn::class)
-        ->and($column->getName())->toBe('Created At');
+    $component = new class([$column])
+    {
+        use HasColumns;
+
+        public function __construct(private array $testColumns) {}
+
+        protected function columns(): array
+        {
+            return $this->testColumns;
+        }
+
+        public function getModel(): Model
+        {
+            return new class extends Model
+            {
+                protected $table = 'test_table';
+            };
+        }
+    };
+
+    expect($component->getColumn('custom_field'))->toBe($column)
+        ->and($component->getColumn('non_existent'))->toBeNull();
+});
+
+it('detects model attributes correctly', function () {
+    $model = new class extends Model
+    {
+        protected $appends = ['full_name'];
+
+        protected $casts = ['settings' => 'array'];
+
+        public function getFullNameAttribute()
+        {
+            return $this->first_name . ' ' . $this->last_name;
+        }
+    };
+
+    $component = new class
+    {
+        use HasColumns;
+
+        public function getModel(): Model
+        {
+            return new class extends Model
+            {
+                protected $table = 'test_table';
+            };
+        }
+
+        // Expose the protected method for testing
+        public function testIsModelAttribute($model, $field)
+        {
+            return $this->isModelAttribute($model, $field);
+        }
+    };
+
+    expect($component->testIsModelAttribute($model, 'full_name'))->toBeTrue()
+        ->and($component->testIsModelAttribute($model, 'settings'))->toBeTrue()
+        ->and($component->testIsModelAttribute($model, 'regular_field'))->toBeFalse();
 });
 
 it('returns null for non-existent column', function () {

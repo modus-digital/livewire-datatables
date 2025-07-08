@@ -78,14 +78,36 @@ abstract class Table extends Component
             $query = $this->applyGlobalSearch($query);
         }
 
-        // Apply filters
+        // Apply filters first to determine if attribute filtering is needed
         $query = $this->applyFilters($query);
 
-        // Apply sorting
+        // Apply sorting to determine if attribute sorting is needed
         $query = $this->applySorting($query);
 
-        // Return paginated results
-        return $query->paginate($this->perPage);
+        // Check if we need to handle attributes in PHP
+        $needsAttributeSorting = $this->requiresAttributeSorting();
+        $needsAttributeFiltering = $this->requiresAttributeFiltering();
+
+        if ($needsAttributeSorting || $needsAttributeFiltering) {
+            // For attribute operations, we need to get all results and process in PHP
+            $results = $query->get();
+
+            // Apply attribute filtering if needed
+            if ($needsAttributeFiltering) {
+                $results = $this->filterByAttributes($results);
+            }
+
+            // Apply attribute sorting if needed
+            if ($needsAttributeSorting) {
+                $results = $this->sortByAttribute($results);
+            }
+
+            // Manual pagination for attribute operations
+            return $this->paginateCollection($results);
+        } else {
+            // Return paginated results (sorting and filtering already applied)
+            return $query->paginate($this->perPage);
+        }
     }
 
     /**
@@ -110,12 +132,8 @@ abstract class Table extends Component
                 $field = $column->getField();
 
                 if ($column->getRelationship()) {
-                    // Handle relationship search
-                    $relation = explode('.', $column->getRelationship())[0];
-                    $query->orWhereHas($relation, function (Builder $subQuery) use ($column) {
-                        $relationField = last(explode('.', $column->getRelationship()));
-                        $subQuery->where($relationField, 'like', "%{$this->search}%");
-                    });
+                    // Handle relationship search with attribute detection
+                    $this->applySearchToRelationship($query, $column);
                 } else {
                     if (! str_contains($field, '.')) {
                         $field = $query->getModel()->getTable() . '.' . $field;
@@ -125,6 +143,193 @@ abstract class Table extends Component
                 }
             }
         });
+    }
+
+    /**
+     * Apply search to a relationship field, handling model attributes.
+     *
+     * @param  Builder<Model>  $query
+     */
+    protected function applySearchToRelationship(Builder $query, \ModusDigital\LivewireDatatables\Columns\Column $column): void
+    {
+        $relationshipPath = $column->getRelationship();
+        $parts = explode('.', $relationshipPath);
+
+        if (count($parts) < 2) {
+            return;
+        }
+
+        $relation = $parts[0];
+        $relationField = $parts[1];
+
+        // Get the related model to check if the field is an attribute
+        $relatedModel = $this->getRelatedModel($relationshipPath);
+
+        if ($relatedModel && $this->isModelAttribute($relatedModel, $relationField)) {
+            // Handle attribute search
+            $this->applyAttributeSearch($query, $relation, $relationField, $relatedModel);
+        } else {
+            // Handle regular field search
+            $query->orWhereHas($relation, function (Builder $subQuery) use ($relationField) {
+                $subQuery->where($relationField, 'like', "%{$this->search}%");
+            });
+        }
+    }
+
+    /**
+     * Apply search to a model attribute.
+     *
+     * @param  Builder<Model>  $query
+     */
+    protected function applyAttributeSearch(Builder $query, string $relation, string $attributeField, \Illuminate\Database\Eloquent\Model $relatedModel): void
+    {
+        // For model attributes, we can't reliably search in SQL
+        // We'll fall back to a best-effort approach using whereHas
+        $query->orWhereHas($relation, function (Builder $subQuery) {
+            // This is a limitation - we can't easily search model attributes in SQL
+            // The search will be less precise for attributes
+            $subQuery->where(function (Builder $innerQuery) {
+                // Try common field patterns that might be used in attributes
+                $commonFields = ['name', 'title', 'description', 'first_name', 'last_name'];
+                foreach ($commonFields as $field) {
+                    if ($innerQuery->getModel()->getConnection()->getSchemaBuilder()->hasColumn($innerQuery->getModel()->getTable(), $field)) {
+                        $innerQuery->orWhere($field, 'like', "%{$this->search}%");
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * Check if current sorting requires attribute sorting (PHP-based).
+     * This method is now a wrapper around the HasSorting trait's requiresAttributeSorting method.
+     */
+    protected function needsAttributeSorting(): bool
+    {
+        // Apply sorting to determine if attribute sorting is needed
+        $query = $this->query();
+        $this->applySorting($query);
+
+        return $this->requiresAttributeSorting();
+    }
+
+    /**
+     * Filter a collection by model attributes.
+     *
+     * @param  Collection<int, Model>  $collection
+     * @return Collection<int, Model>
+     */
+    protected function filterByAttributes(Collection $collection): Collection
+    {
+        $attributeFilters = $this->getActiveAttributeFilters();
+
+        if (empty($attributeFilters)) {
+            return $collection;
+        }
+
+        return $collection->filter(function ($model) use ($attributeFilters) {
+            foreach ($attributeFilters as $filterDetails) {
+                $relationName = $filterDetails['relation'];
+                $attributeField = $filterDetails['field'];
+                $filterValue = $filterDetails['value'];
+                $operator = $filterDetails['operator'] ?? 'like';
+                $multiple = $filterDetails['multiple'] ?? false;
+
+                $relatedModel = $model->{$relationName};
+                if (! $relatedModel) {
+                    return false;
+                }
+
+                $attributeValue = $this->getModelAttributeValue($relatedModel, $attributeField);
+
+                // Apply the filter based on operator
+                if (! $this->matchesAttributeFilter($attributeValue, $filterValue, $operator, $multiple)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * Check if an attribute value matches the filter criteria.
+     */
+    protected function matchesAttributeFilter(mixed $attributeValue, mixed $filterValue, string $operator, bool $multiple): bool
+    {
+        if ($attributeValue === null) {
+            return false;
+        }
+
+        $attributeString = (string) $attributeValue;
+
+        if ($multiple && is_array($filterValue)) {
+            return in_array($attributeValue, $filterValue);
+        }
+
+        return match ($operator) {
+            '=' => $attributeString === (string) $filterValue,
+            'like' => str_contains(strtolower($attributeString), strtolower((string) $filterValue)),
+            'starts_with' => str_starts_with(strtolower($attributeString), strtolower((string) $filterValue)),
+            'ends_with' => str_ends_with(strtolower($attributeString), strtolower((string) $filterValue)),
+            default => str_contains(strtolower($attributeString), strtolower((string) $filterValue)),
+        };
+    }
+
+    /**
+     * Sort a collection by a model attribute.
+     *
+     * @param  Collection<int, Model>  $collection
+     * @return Collection<int, Model>
+     */
+    protected function sortByAttribute(Collection $collection): Collection
+    {
+        if (empty($this->sortField)) {
+            return $collection;
+        }
+
+        $parts = explode('.', $this->sortField);
+        if (count($parts) !== 2) {
+            return $collection;
+        }
+
+        [$relationName, $relationField] = $parts;
+        $sortDirection = $this->sortDirection === 'desc' ? SORT_DESC : SORT_ASC;
+
+        return $collection->sortBy(function ($model) use ($relationName, $relationField) {
+            $relatedModel = $model->{$relationName};
+            if (! $relatedModel) {
+                return null;
+            }
+
+            return $this->getModelAttributeValue($relatedModel, $relationField);
+        }, SORT_REGULAR, $sortDirection === SORT_DESC);
+    }
+
+    /**
+     * Manually paginate a collection.
+     *
+     * @param  Collection<int, Model>  $collection
+     * @return LengthAwarePaginator<Model>
+     */
+    protected function paginateCollection(Collection $collection): LengthAwarePaginator
+    {
+        $page = request()->get('page', 1);
+        $perPage = $this->perPage;
+        $offset = ($page - 1) * $perPage;
+
+        $items = $collection->slice($offset, $perPage)->values();
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $items,
+            $collection->count(),
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'pageName' => 'page',
+            ]
+        );
     }
 
     /**
