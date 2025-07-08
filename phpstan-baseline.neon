@@ -19,31 +19,7 @@ parameters:
 			path: src/Filters/Filter.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Support\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\:\:pluck\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Livewire/Table.php
-
-		-
-			message: '#^Generic type Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<Illuminate\\Database\\Eloquent\\Model\> in PHPDoc tag @return does not specify all template types of interface Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\: TKey, TValue$#'
-			identifier: generics.lessTypes
-			count: 1
-			path: src/Livewire/Table.php
-
-		-
-			message: '#^Method ModusDigital\\LivewireDatatables\\Livewire\\Table\:\:getRows\(\) should return Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Support\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\> but returns Illuminate\\Pagination\\LengthAwarePaginator\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Livewire/Table.php
-
-		-
 			message: '#^Property ModusDigital\\LivewireDatatables\\Livewire\\Table\:\:\$filters type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Livewire/Table.php
-
-		-
-			message: '#^Type Illuminate\\Database\\Eloquent\\Model in generic type Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\<Illuminate\\Database\\Eloquent\\Model\> in PHPDoc tag @return is not subtype of template type TKey of \(int\|string\) of interface Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\.$#'
-			identifier: generics.notSubtype
 			count: 1
 			path: src/Livewire/Table.php
