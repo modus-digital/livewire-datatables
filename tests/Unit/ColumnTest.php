@@ -123,7 +123,8 @@ describe('Column Value Extraction', function () {
     it('extracts values correctly with new constructor pattern', function () {
         $column = Column::make('user_name', 'Full Name');
 
-        $record = new class {
+        $record = new class
+        {
             public string $user_name = 'John Doe';
         };
 
@@ -133,7 +134,8 @@ describe('Column Value Extraction', function () {
     it('extracts values correctly with label method', function () {
         $column = Column::make('user_name')->label('Full Name');
 
-        $record = new class {
+        $record = new class
+        {
             public string $user_name = 'Jane Smith';
         };
 
@@ -143,7 +145,8 @@ describe('Column Value Extraction', function () {
     it('extracts values correctly with field method', function () {
         $column = Column::make('display_name')->field('actual_field');
 
-        $record = new class {
+        $record = new class
+        {
             public string $actual_field = 'Test Value';
         };
 

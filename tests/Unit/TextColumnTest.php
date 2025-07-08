@@ -19,7 +19,7 @@ it('limits text and casts enums', function () {
 });
 
 it('renders badge using callback and field fallback', function () {
-    $column = TextColumn::make('role')->badge(fn($record) => $record->color);
+    $column = TextColumn::make('role')->badge(fn ($record) => $record->color);
 
     $record = new class
     {
@@ -54,7 +54,8 @@ describe('TextColumn Enhanced Usage', function () {
             ->limit(50)
             ->badge('blue');
 
-        $record = new class {
+        $record = new class
+        {
             public string $description = 'This is a very long product description that should be truncated';
         };
 
@@ -72,7 +73,8 @@ describe('TextColumn Enhanced Usage', function () {
             ->field('actual_field')
             ->limit(25);
 
-        $record = new class {
+        $record = new class
+        {
             public string $actual_field = 'This is a test value for the field';
         };
 
