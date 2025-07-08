@@ -13,11 +13,13 @@
         </div>
     @endif
 
-    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        @include('livewire-datatables::partials.table-head')
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            @include('livewire-datatables::partials.table-head')
 
-        @include('livewire-datatables::partials.table-body')
-    </table>
+            @include('livewire-datatables::partials.table-body')
+        </table>
+    </div>
 
     @if($rows->isEmpty())
         @include('livewire-datatables::partials.empty-state')
