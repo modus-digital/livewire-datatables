@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ModusDigital\LivewireDatatables\Columns;
 
 use Closure;
+use Deprecated;
 use Illuminate\Support\Str;
 
 class Column
@@ -51,8 +52,11 @@ class Column
         return $this;
     }
 
+    #[Deprecated(message: 'Please use the field method instead', since: '1.2.1')]
     public function relationship(string $relationship): self
     {
+        trigger_error('The relationship() method is deprecated. Use field() method instead.', E_USER_DEPRECATED);
+
         $this->relationship = $relationship;
 
         return $this;
@@ -131,8 +135,11 @@ class Column
         return $this->field ?? $this->name;
     }
 
+    #[Deprecated(message: 'Please use the field method instead', since: '1.2.1')]
     public function getRelationship(): ?string
     {
+        trigger_error('The getRelationship() method is deprecated. Use field() method with dot notation instead.', E_USER_DEPRECATED);
+
         return $this->relationship;
     }
 
@@ -185,6 +192,7 @@ class Column
 
     protected function extractValue(mixed $record): mixed
     {
+        // Check deprecated relationship property first for backward compatibility
         if ($this->relationship) {
             return data_get($record, $this->relationship);
         }
@@ -198,6 +206,7 @@ class Column
             return $this->sortField;
         }
 
+        // Check deprecated relationship property first for backward compatibility
         if ($this->relationship) {
             return $this->relationship;
         }

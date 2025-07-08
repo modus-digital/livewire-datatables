@@ -78,7 +78,14 @@ trait HasSorting
         $relationship = null;
         if ($column) {
             $sortField = $column->getSortField();
+
+            // Suppress deprecation warnings for internal compatibility check
+            $originalErrorReporting = error_reporting();
+            error_reporting($originalErrorReporting & ~E_USER_DEPRECATED);
+
             $relationship = $column->getRelationship();
+
+            error_reporting($originalErrorReporting);
         }
 
         if (! $relationship && str_contains($sortField, '.')) {

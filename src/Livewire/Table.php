@@ -129,18 +129,27 @@ abstract class Table extends Component
 
         return $query->where(function (Builder $query) use ($searchableColumns) {
             foreach ($searchableColumns as $column) {
-                $field = $column->getField();
+                $query->orWhere(function ($q) use ($column) {
+                    // Suppress deprecation warnings for internal compatibility check
+                    $originalErrorReporting = error_reporting();
+                    error_reporting($originalErrorReporting & ~E_USER_DEPRECATED);
 
-                if ($column->getRelationship()) {
-                    // Handle relationship search with attribute detection
-                    $this->applySearchToRelationship($query, $column);
-                } else {
-                    if (! str_contains($field, '.')) {
-                        $field = $query->getModel()->getTable() . '.' . $field;
+                    $hasRelationship = $column->getRelationship() !== null;
+
+                    error_reporting($originalErrorReporting);
+
+                    if ($hasRelationship) {
+                        // Handle relationship search with attribute detection
+                        $this->applySearchToRelationship($q, $column);
+                    } else {
+                        // Handle regular field search
+                        $field = $column->getField();
+                        if (! str_contains($field, '.')) {
+                            $field = $q->getModel()->getTable() . '.' . $field;
+                        }
+                        $q->where($field, 'like', "%{$this->search}%");
                     }
-
-                    $query->orWhere($field, 'like', "%{$this->search}%");
-                }
+                });
             }
         });
     }
@@ -152,7 +161,13 @@ abstract class Table extends Component
      */
     protected function applySearchToRelationship(Builder $query, \ModusDigital\LivewireDatatables\Columns\Column $column): void
     {
+        // Suppress deprecation warnings for internal compatibility check
+        $originalErrorReporting = error_reporting();
+        error_reporting($originalErrorReporting & ~E_USER_DEPRECATED);
+
         $relationshipPath = $column->getRelationship();
+
+        error_reporting($originalErrorReporting);
         $parts = explode('.', $relationshipPath);
 
         if (count($parts) < 2) {

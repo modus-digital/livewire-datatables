@@ -73,8 +73,26 @@ trait HasColumns
             return $column;
         }
 
-        // If not found, try to find by relationship match
-        return $this->getColumns()->first(fn (Column $column) => $column->getRelationship() === $field);
+        // For backward compatibility, check if any column has this field as a relationship
+        // This supports the deprecated relationship() method
+        $relationshipColumn = $this->getColumns()->first(function (Column $column) use ($field) {
+            // Suppress deprecation warnings for internal compatibility check
+            $originalErrorReporting = error_reporting();
+            error_reporting($originalErrorReporting & ~E_USER_DEPRECATED);
+
+            $relationship = $column->getRelationship();
+
+            error_reporting($originalErrorReporting);
+
+            return $relationship === $field;
+        });
+
+        if ($relationshipColumn) {
+            return $relationshipColumn;
+        }
+
+        // Also check if any column's field contains dot notation matching the search field
+        return $this->getColumns()->first(fn (Column $column) => $column->getField() === $field || str_contains($column->getField(), $field));
     }
 
     /**
