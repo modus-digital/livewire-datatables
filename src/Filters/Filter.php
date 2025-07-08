@@ -69,6 +69,26 @@ abstract class Filter
     }
 
     /**
+     * Get the attribute filtering details.
+     * Override in child classes that support attribute filtering.
+     *
+     * @return array<string, mixed>
+     */
+    public function getAttributeFilterDetails(): array
+    {
+        return [];
+    }
+
+    /**
+     * Check if current filtering requires attribute-based filtering.
+     * Override in child classes that support attribute filtering.
+     */
+    public function requiresAttributeFiltering(): bool
+    {
+        return false;
+    }
+
+    /**
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */

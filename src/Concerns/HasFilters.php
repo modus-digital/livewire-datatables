@@ -89,7 +89,7 @@ trait HasFilters
                 $dummyQuery = $this->getModel()->newQuery();
                 $filter->apply($dummyQuery, $value);
 
-                if (method_exists($filter, 'requiresAttributeFiltering') && $filter->requiresAttributeFiltering()) {
+                if ($filter->requiresAttributeFiltering()) {
                     return true;
                 }
             }
@@ -100,6 +100,8 @@ trait HasFilters
 
     /**
      * Get all active attribute filters.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getActiveAttributeFilters(): array
     {
@@ -113,7 +115,7 @@ trait HasFilters
                 $dummyQuery = $this->getModel()->newQuery();
                 $filter->apply($dummyQuery, $value);
 
-                if (method_exists($filter, 'requiresAttributeFiltering') && $filter->requiresAttributeFiltering()) {
+                if ($filter->requiresAttributeFiltering()) {
                     $details = $filter->getAttributeFilterDetails();
                     $details['filter_instance'] = $filter;
                     $attributeFilters[] = $details;
@@ -161,6 +163,8 @@ trait HasFilters
 
     /**
      * Get all filter values, handling dotted field names.
+     *
+     * @return array<string, mixed>
      */
     protected function getFilterValues(): array
     {

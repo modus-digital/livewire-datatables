@@ -20,6 +20,8 @@ class SelectFilter extends Filter
 
     /**
      * Store the attribute filtering details for later use.
+     *
+     * @var array<string, mixed>
      */
     protected array $attributeFilterDetails = [];
 
@@ -63,6 +65,8 @@ class SelectFilter extends Filter
 
     /**
      * Get the attribute filtering details.
+     *
+     * @return array<string, mixed>
      */
     public function getAttributeFilterDetails(): array
     {
@@ -196,7 +200,7 @@ class SelectFilter extends Filter
                 $method = $reflection->getMethod($field);
                 $returnType = $method->getReturnType();
 
-                if ($returnType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
+                if ($returnType instanceof \ReflectionNamedType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
                     return true;
                 }
             }
@@ -207,6 +211,8 @@ class SelectFilter extends Filter
 
     /**
      * Check if model has specific database columns.
+     *
+     * @param  array<int, string>  $columns
      */
     protected function hasModelColumns(\Illuminate\Database\Eloquent\Model $model, array $columns): bool
     {
