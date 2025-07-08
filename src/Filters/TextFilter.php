@@ -168,7 +168,7 @@ class TextFilter extends Filter
      */
     protected function isModelAttribute(\Illuminate\Database\Eloquent\Model $model, string $field): bool
     {
-        // Check if it's an accessor method
+        // Check if it's an accessor method (old Laravel syntax)
         $accessorMethod = 'get' . \Illuminate\Support\Str::studly($field) . 'Attribute';
         if (method_exists($model, $accessorMethod)) {
             return true;
@@ -182,6 +182,19 @@ class TextFilter extends Filter
         // Check if it's a cast attribute
         if (array_key_exists($field, $model->getCasts())) {
             return true;
+        }
+
+        // Check if it's a Laravel 9+ Attribute (new syntax)
+        if (method_exists($model, $field)) {
+            $reflection = new \ReflectionClass($model);
+            if ($reflection->hasMethod($field)) {
+                $method = $reflection->getMethod($field);
+                $returnType = $method->getReturnType();
+
+                if ($returnType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
+                    return true;
+                }
+            }
         }
 
         return false;

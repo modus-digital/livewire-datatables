@@ -35,7 +35,7 @@ trait HasColumns
     {
         if (empty($this->columnCache)) {
             $this->columnCache = $this->columns();
-            $this->columnsCollection = collect($this->columnCache)->filter(fn(Column $column) => ! $column->isHidden());
+            $this->columnsCollection = collect($this->columnCache)->filter(fn (Column $column) => ! $column->isHidden());
         }
 
         return $this->columnsCollection;
@@ -48,7 +48,7 @@ trait HasColumns
      */
     public function getSearchableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn(Column $column) => $column->isSearchable());
+        return $this->getColumns()->filter(fn (Column $column) => $column->isSearchable());
     }
 
     /**
@@ -58,7 +58,7 @@ trait HasColumns
      */
     public function getSortableColumns(): Collection
     {
-        return $this->getColumns()->filter(fn(Column $column) => $column->isSortable());
+        return $this->getColumns()->filter(fn (Column $column) => $column->isSortable());
     }
 
     /**
@@ -67,14 +67,14 @@ trait HasColumns
     public function getColumn(string $field): ?Column
     {
         // First try to find by exact field match
-        $column = $this->getColumns()->first(fn(Column $column) => $column->getField() === $field);
+        $column = $this->getColumns()->first(fn (Column $column) => $column->getField() === $field);
 
         if ($column) {
             return $column;
         }
 
         // If not found, try to find by relationship match
-        return $this->getColumns()->first(fn(Column $column) => $column->getRelationship() === $field);
+        return $this->getColumns()->first(fn (Column $column) => $column->getRelationship() === $field);
     }
 
     /**
@@ -130,7 +130,7 @@ trait HasColumns
      */
     protected function isModelAttribute(\Illuminate\Database\Eloquent\Model $model, string $field): bool
     {
-        // Check if it's an accessor method
+        // Check if it's an accessor method (old Laravel syntax)
         $accessorMethod = 'get' . \Illuminate\Support\Str::studly($field) . 'Attribute';
         if (method_exists($model, $accessorMethod)) {
             return true;
@@ -144,6 +144,19 @@ trait HasColumns
         // Check if it's a cast attribute
         if (array_key_exists($field, $model->getCasts())) {
             return true;
+        }
+
+        // Check if it's a Laravel 9+ Attribute (new syntax)
+        if (method_exists($model, $field)) {
+            $reflection = new \ReflectionClass($model);
+            if ($reflection->hasMethod($field)) {
+                $method = $reflection->getMethod($field);
+                $returnType = $method->getReturnType();
+
+                if ($returnType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
+                    return true;
+                }
+            }
         }
 
         return false;
