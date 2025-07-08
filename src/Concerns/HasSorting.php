@@ -19,6 +19,11 @@ trait HasSorting
     protected array $joinedTables = [];
 
     /**
+     * Flag to indicate if current sorting requires attribute-based sorting.
+     */
+    protected bool $requiresAttributeSorting = false;
+
+    /**
      * Default sort field.
      */
     protected string $defaultSortField = 'id';
@@ -55,6 +60,9 @@ trait HasSorting
      */
     public function applySorting(Builder $query): Builder
     {
+        // Reset the attribute sorting flag
+        $this->requiresAttributeSorting = false;
+
         $sortField = $this->sortField ?: $this->defaultSortField;
         $sortDirection = $this->sortDirection ?: $this->defaultSortDirection;
 
@@ -135,17 +143,27 @@ trait HasSorting
     /**
      * Apply sorting for model attributes.
      * Since attributes are computed in PHP, we can't sort them in SQL.
-     * We'll store the sorting info to handle it after fetching the data.
+     * We'll set a flag to indicate that attribute sorting is needed.
      *
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applySortingWithAttribute(Builder $query, \Illuminate\Database\Eloquent\Relations\Relation $relationInstance, string $attributeField, string $sortDirection): Builder
     {
+        // Set flag to indicate that attribute sorting is needed
+        $this->requiresAttributeSorting = true;
+
         // For model attributes, we can't sort in SQL since they're computed in PHP
-        // We'll store the sorting info and handle it in the table component
-        // For now, we'll just return the query unchanged and let the table handle it
+        // We return the query unchanged - the Table class will handle the sorting
         return $query;
+    }
+
+    /**
+     * Check if current sorting requires attribute-based sorting.
+     */
+    public function requiresAttributeSorting(): bool
+    {
+        return $this->requiresAttributeSorting;
     }
 
     /**
