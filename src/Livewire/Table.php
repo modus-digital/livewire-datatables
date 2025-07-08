@@ -81,11 +81,23 @@ abstract class Table extends Component
         // Apply filters
         $query = $this->applyFilters($query);
 
-        // Apply sorting
-        $query = $this->applySorting($query);
+        // Check if we need to sort by a model attribute
+        $needsAttributeSorting = $this->needsAttributeSorting();
 
-        // Return paginated results
-        return $query->paginate($this->perPage);
+        if ($needsAttributeSorting) {
+            // For attribute sorting, we need to get all results and sort in PHP
+            $results = $query->get();
+            $sortedResults = $this->sortByAttribute($results);
+
+            // Manual pagination for attribute sorting
+            return $this->paginateCollection($sortedResults);
+        } else {
+            // Apply database sorting
+            $query = $this->applySorting($query);
+
+            // Return paginated results
+            return $query->paginate($this->perPage);
+        }
     }
 
     /**
@@ -110,12 +122,8 @@ abstract class Table extends Component
                 $field = $column->getField();
 
                 if ($column->getRelationship()) {
-                    // Handle relationship search
-                    $relation = explode('.', $column->getRelationship())[0];
-                    $query->orWhereHas($relation, function (Builder $subQuery) use ($column) {
-                        $relationField = last(explode('.', $column->getRelationship()));
-                        $subQuery->where($relationField, 'like', "%{$this->search}%");
-                    });
+                    // Handle relationship search with attribute detection
+                    $this->applySearchToRelationship($query, $column);
                 } else {
                     if (! str_contains($field, '.')) {
                         $field = $query->getModel()->getTable() . '.' . $field;
@@ -125,6 +133,145 @@ abstract class Table extends Component
                 }
             }
         });
+    }
+
+    /**
+     * Apply search to a relationship field, handling model attributes.
+     *
+     * @param  Builder<Model>  $query
+     */
+    protected function applySearchToRelationship(Builder $query, \ModusDigital\LivewireDatatables\Columns\Column $column): void
+    {
+        $relationshipPath = $column->getRelationship();
+        $parts = explode('.', $relationshipPath);
+
+        if (count($parts) < 2) {
+            return;
+        }
+
+        $relation = $parts[0];
+        $relationField = $parts[1];
+
+        // Get the related model to check if the field is an attribute
+        $relatedModel = $this->getRelatedModel($relationshipPath);
+
+        if ($relatedModel && $this->isModelAttribute($relatedModel, $relationField)) {
+            // Handle attribute search
+            $this->applyAttributeSearch($query, $relation, $relationField, $relatedModel);
+        } else {
+            // Handle regular field search
+            $query->orWhereHas($relation, function (Builder $subQuery) use ($relationField) {
+                $subQuery->where($relationField, 'like', "%{$this->search}%");
+            });
+        }
+    }
+
+    /**
+     * Apply search to a model attribute.
+     *
+     * @param  Builder<Model>  $query
+     */
+    protected function applyAttributeSearch(Builder $query, string $relation, string $attributeField, \Illuminate\Database\Eloquent\Model $relatedModel): void
+    {
+        // For model attributes, we can't reliably search in SQL
+        // We'll fall back to a best-effort approach using whereHas
+        $query->orWhereHas($relation, function (Builder $subQuery) {
+            // This is a limitation - we can't easily search model attributes in SQL
+            // The search will be less precise for attributes
+            $subQuery->where(function (Builder $innerQuery) {
+                // Try common field patterns that might be used in attributes
+                $commonFields = ['name', 'title', 'description', 'first_name', 'last_name'];
+                foreach ($commonFields as $field) {
+                    if ($innerQuery->getModel()->getConnection()->getSchemaBuilder()->hasColumn($innerQuery->getModel()->getTable(), $field)) {
+                        $innerQuery->orWhere($field, 'like', "%{$this->search}%");
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * Check if current sorting requires attribute sorting (PHP-based).
+     */
+    protected function needsAttributeSorting(): bool
+    {
+        if (empty($this->sortField)) {
+            return false;
+        }
+
+        // Check if sorting by a relationship field
+        if (str_contains($this->sortField, '.')) {
+            $parts = explode('.', $this->sortField);
+            if (count($parts) === 2) {
+                [$relationName, $relationField] = $parts;
+                $model = $this->getModel();
+
+                if (method_exists($model, $relationName)) {
+                    $relationInstance = $model->{$relationName}();
+                    $relatedModel = $relationInstance->getRelated();
+
+                    return $this->isModelAttribute($relatedModel, $relationField);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Sort a collection by a model attribute.
+     *
+     * @param  Collection<int, Model>  $collection
+     * @return Collection<int, Model>
+     */
+    protected function sortByAttribute(Collection $collection): Collection
+    {
+        if (empty($this->sortField)) {
+            return $collection;
+        }
+
+        $parts = explode('.', $this->sortField);
+        if (count($parts) !== 2) {
+            return $collection;
+        }
+
+        [$relationName, $relationField] = $parts;
+        $sortDirection = $this->sortDirection === 'desc' ? SORT_DESC : SORT_ASC;
+
+        return $collection->sortBy(function ($model) use ($relationName, $relationField) {
+            $relatedModel = $model->{$relationName};
+            if (! $relatedModel) {
+                return null;
+            }
+
+            return $this->getModelAttributeValue($relatedModel, $relationField);
+        }, SORT_REGULAR, $sortDirection === SORT_DESC);
+    }
+
+    /**
+     * Manually paginate a collection.
+     *
+     * @param  Collection<int, Model>  $collection
+     * @return LengthAwarePaginator<Model>
+     */
+    protected function paginateCollection(Collection $collection): LengthAwarePaginator
+    {
+        $page = request()->get('page', 1);
+        $perPage = $this->perPage;
+        $offset = ($page - 1) * $perPage;
+
+        $items = $collection->slice($offset, $perPage)->values();
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $items,
+            $collection->count(),
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'pageName' => 'page',
+            ]
+        );
     }
 
     /**
