@@ -37,8 +37,8 @@ class Column
     /**
      * Create a new Column instance.
      *
-     * @param string $name The field name or display name
-     * @param string|null $label Optional display label - if provided, $name becomes the field
+     * @param  string  $name  The field name or display name
+     * @param  string|null  $label  Optional display label - if provided, $name becomes the field
      */
     public function __construct(string $name, ?string $label = null)
     {
@@ -56,9 +56,8 @@ class Column
     /**
      * Create a new Column instance.
      *
-     * @param string $name The field name or display name
-     * @param string|null $label Optional display label - if provided, $name becomes the field
-     * @return static
+     * @param  string  $name  The field name or display name
+     * @param  string|null  $label  Optional display label - if provided, $name becomes the field
      */
     public static function make(string $name, ?string $label = null): static
     {
@@ -68,8 +67,7 @@ class Column
     /**
      * Set the display label for the column.
      *
-     * @param string $label The display label
-     * @return self
+     * @param  string  $label  The display label
      */
     public function label(string $label): self
     {
@@ -81,8 +79,7 @@ class Column
     /**
      * Set the field name for the column.
      *
-     * @param string $field The field name
-     * @return self
+     * @param  string  $field  The field name
      */
     public function field(string $field): self
     {
@@ -104,8 +101,7 @@ class Column
     /**
      * Set the field to use for sorting.
      *
-     * @param string $sortField The field name to sort by
-     * @return self
+     * @param  string  $sortField  The field name to sort by
      */
     public function sortField(string $sortField): self
     {
@@ -117,8 +113,7 @@ class Column
     /**
      * Set a custom sorting callback.
      *
-     * @param Closure $callback The sorting callback function
-     * @return self
+     * @param  Closure  $callback  The sorting callback function
      */
     public function sortUsing(Closure $callback): self
     {
@@ -130,8 +125,7 @@ class Column
     /**
      * Make the column sortable.
      *
-     * @param bool $sortable Whether the column should be sortable
-     * @return self
+     * @param  bool  $sortable  Whether the column should be sortable
      */
     public function sortable(bool $sortable = true): self
     {
@@ -143,8 +137,7 @@ class Column
     /**
      * Make the column searchable.
      *
-     * @param bool $searchable Whether the column should be searchable
-     * @return self
+     * @param  bool  $searchable  Whether the column should be searchable
      */
     public function searchable(bool $searchable = true): self
     {
@@ -156,8 +149,7 @@ class Column
     /**
      * Set a formatting callback for the column value.
      *
-     * @param Closure $callback The formatting callback function
-     * @return self
+     * @param  Closure  $callback  The formatting callback function
      */
     public function format(Closure $callback): self
     {
@@ -169,8 +161,7 @@ class Column
     /**
      * Hide the column from display.
      *
-     * @param bool $hidden Whether the column should be hidden
-     * @return self
+     * @param  bool  $hidden  Whether the column should be hidden
      */
     public function hidden(bool $hidden = true): self
     {
@@ -182,8 +173,7 @@ class Column
     /**
      * Set the column width.
      *
-     * @param string $width The column width (e.g., '100px', '20%')
-     * @return self
+     * @param  string  $width  The column width (e.g., '100px', '20%')
      */
     public function width(string $width): self
     {
@@ -195,8 +185,7 @@ class Column
     /**
      * Set the column text alignment.
      *
-     * @param string $align The alignment (left, center, right)
-     * @return self
+     * @param  string  $align  The alignment (left, center, right)
      */
     public function align(string $align): self
     {
@@ -208,8 +197,7 @@ class Column
     /**
      * Set a custom view for the column.
      *
-     * @param string $view The view name
-     * @return self
+     * @param  string  $view  The view name
      */
     public function view(string $view): self
     {
@@ -309,7 +297,7 @@ class Column
     /**
      * Get the formatted value for the column from a record.
      *
-     * @param mixed $record The record to extract value from
+     * @param  mixed  $record  The record to extract value from
      * @return mixed The formatted value
      */
     public function getValue(mixed $record): mixed
@@ -332,7 +320,7 @@ class Column
     /**
      * Extract the raw value from a record.
      *
-     * @param mixed $record The record to extract value from
+     * @param  mixed  $record  The record to extract value from
      * @return mixed The raw value
      */
     protected function extractValue(mixed $record): mixed

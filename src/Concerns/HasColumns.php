@@ -76,15 +76,15 @@ trait HasColumns
         // For backward compatibility, check if any column has this field as a relationship
         // This supports the deprecated relationship() method
         $relationshipColumn = $this->getColumns()->first(function (Column $column) use ($field) {
-            // Suppress deprecation warnings for internal compatibility check
-            $originalErrorReporting = error_reporting();
-            error_reporting($originalErrorReporting & ~E_USER_DEPRECATED);
+            // Check if the field contains dot notation (indicating a relationship)
+            $columnField = $column->getField();
+            if (str_contains($columnField, '.')) {
+                $parts = explode('.', $columnField, 2);
 
-            $relationship = $column->getRelationship();
+                return $parts[0] === $field;
+            }
 
-            error_reporting($originalErrorReporting);
-
-            return $relationship === $field;
+            return false;
         });
 
         if ($relationshipColumn) {
@@ -171,7 +171,7 @@ trait HasColumns
                 $method = $reflection->getMethod($field);
                 $returnType = $method->getReturnType();
 
-                if ($returnType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
+                if ($returnType instanceof \ReflectionNamedType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
                     return true;
                 }
             }
@@ -182,6 +182,8 @@ trait HasColumns
 
     /**
      * Check if model has specific database columns.
+     *
+     * @param  array<int, string>  $columns
      */
     protected function hasModelColumns(\Illuminate\Database\Eloquent\Model $model, array $columns): bool
     {
