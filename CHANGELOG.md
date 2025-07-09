@@ -2,6 +2,17 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.2.2 - 2025-07-09
+
+### What's Changed
+
+* Fix nested relationship sorting by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/21
+* Fix nested sorting by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/22
+* **Code Quality**: Enhanced method signatures and return type specifications throughout the codebase
+* **Enhanced Type Safety**: Added comprehensive PHPDoc type annotations for arrays and generic types
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.2.1...1.2.2
+
 ## 1.2.1 - 2025-07-08
 
 ### What's Changed
