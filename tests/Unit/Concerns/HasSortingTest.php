@@ -42,7 +42,7 @@ beforeEach(function () {
             }
 
             if ($field === 'user.name') {
-                return TextColumn::make('User Name')->relationship('user.name');
+                return TextColumn::make('User Name')->field('user.name');
             }
 
             return null;

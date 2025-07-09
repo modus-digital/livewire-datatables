@@ -78,7 +78,12 @@ trait HasSorting
         $relationship = null;
         if ($column) {
             $sortField = $column->getSortField();
-            $relationship = $column->getRelationship();
+
+            // Check if the field contains dot notation (indicating a relationship)
+            $columnField = $column->getField();
+            if (str_contains($columnField, '.')) {
+                $relationship = $columnField;
+            }
         }
 
         if (! $relationship && str_contains($sortField, '.')) {
@@ -152,6 +157,7 @@ trait HasSorting
      * We'll set a flag to indicate that attribute sorting is needed.
      *
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model, mixed>  $relationInstance
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applySortingWithAttribute(Builder $query, \Illuminate\Database\Eloquent\Relations\Relation $relationInstance, string $attributeField, string $sortDirection): Builder

@@ -67,7 +67,7 @@ abstract class Table extends Component
     /**
      * Get the table data.
      *
-     * @return Collection<int, Model>|LengthAwarePaginator<Model>
+     * @return Collection<int, Model>|LengthAwarePaginator<int, Model>
      */
     public function getRows(): Collection|LengthAwarePaginator
     {
@@ -129,18 +129,23 @@ abstract class Table extends Component
 
         return $query->where(function (Builder $query) use ($searchableColumns) {
             foreach ($searchableColumns as $column) {
-                $field = $column->getField();
+                $query->orWhere(function ($q) use ($column) {
+                    // Check if the field contains dot notation (indicating a relationship)
+                    $columnField = $column->getField();
+                    $hasRelationship = str_contains($columnField, '.');
 
-                if ($column->getRelationship()) {
-                    // Handle relationship search with attribute detection
-                    $this->applySearchToRelationship($query, $column);
-                } else {
-                    if (! str_contains($field, '.')) {
-                        $field = $query->getModel()->getTable() . '.' . $field;
+                    if ($hasRelationship) {
+                        // Handle relationship search with attribute detection
+                        $this->applySearchToRelationship($q, $column);
+                    } else {
+                        // Handle regular field search
+                        $field = $column->getField();
+                        if (! str_contains($field, '.')) {
+                            $field = $q->getModel()->getTable() . '.' . $field;
+                        }
+                        $q->where($field, 'like', "%{$this->search}%");
                     }
-
-                    $query->orWhere($field, 'like', "%{$this->search}%");
-                }
+                });
             }
         });
     }
@@ -152,7 +157,14 @@ abstract class Table extends Component
      */
     protected function applySearchToRelationship(Builder $query, \ModusDigital\LivewireDatatables\Columns\Column $column): void
     {
-        $relationshipPath = $column->getRelationship();
+        // Get the relationship path from the field (using dot notation)
+        $relationshipPath = $column->getField();
+
+        // If field doesn't contain dot notation, it's not a relationship
+        if (! str_contains($relationshipPath, '.')) {
+            return;
+        }
+
         $parts = explode('.', $relationshipPath);
 
         if (count($parts) < 2) {
@@ -189,11 +201,14 @@ abstract class Table extends Component
             // This is a limitation - we can't easily search model attributes in SQL
             // The search will be less precise for attributes
             $subQuery->where(function (Builder $innerQuery) {
+                // Get the table name for the related model
+                $table = $innerQuery->getModel()->getTable();
+
                 // Try common field patterns that might be used in attributes
                 $commonFields = ['name', 'title', 'description', 'first_name', 'last_name'];
                 foreach ($commonFields as $field) {
-                    if ($innerQuery->getModel()->getConnection()->getSchemaBuilder()->hasColumn($innerQuery->getModel()->getTable(), $field)) {
-                        $innerQuery->orWhere($field, 'like', "%{$this->search}%");
+                    if ($innerQuery->getModel()->getConnection()->getSchemaBuilder()->hasColumn($table, $field)) {
+                        $innerQuery->orWhere("{$table}.{$field}", 'like', "%{$this->search}%");
                     }
                 }
             });
@@ -310,7 +325,7 @@ abstract class Table extends Component
      * Manually paginate a collection.
      *
      * @param  Collection<int, Model>  $collection
-     * @return LengthAwarePaginator<Model>
+     * @return LengthAwarePaginator<int, Model>
      */
     protected function paginateCollection(Collection $collection): LengthAwarePaginator
     {

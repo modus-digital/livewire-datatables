@@ -17,6 +17,8 @@ class TextFilter extends Filter
 
     /**
      * Store the attribute filtering details for later use.
+     *
+     * @var array<string, mixed>
      */
     protected array $attributeFilterDetails = [];
 
@@ -58,6 +60,8 @@ class TextFilter extends Filter
 
     /**
      * Get the attribute filtering details.
+     *
+     * @return array<string, mixed>
      */
     public function getAttributeFilterDetails(): array
     {
@@ -191,7 +195,7 @@ class TextFilter extends Filter
                 $method = $reflection->getMethod($field);
                 $returnType = $method->getReturnType();
 
-                if ($returnType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
+                if ($returnType instanceof \ReflectionNamedType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
                     return true;
                 }
             }

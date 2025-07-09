@@ -119,7 +119,21 @@ trait HasRowSelection
      */
     protected function getVisibleRowIds(): array
     {
-        return $this->getRows()->pluck('id')->toArray();
+        $rows = $this->getRows();
+
+        // Handle Collection type
+        if (method_exists($rows, 'pluck') && ! method_exists($rows, 'items')) {
+            /** @var \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Model> $rows */
+            return $rows->pluck('id')->toArray();
+        }
+
+        // Handle LengthAwarePaginator type
+        if (method_exists($rows, 'items')) {
+            /** @var \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, \Illuminate\Database\Eloquent\Model> $rows */
+            return collect($rows->items())->pluck('id')->toArray();
+        }
+
+        return [];
     }
 
     /**
