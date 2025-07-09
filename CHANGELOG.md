@@ -2,6 +2,15 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.2.3 - 2025-07-09
+
+### What's Changed
+
+* Bugfix/sorting with nested relations by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/23
+* Feature/enhanced column usage by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/24
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.2.0...1.2.3
+
 ## 1.2.2 - 2025-07-09
 
 ### What's Changed
