@@ -108,7 +108,7 @@ abstract class Filter
         // Check if it's a cast attribute but NOT a database column
         if (array_key_exists($field, $model->getCasts())) {
             try {
-                if (!$this->isDatabaseColumn($model, $field)) {
+                if (! $this->isDatabaseColumn($model, $field)) {
                     return true;
                 }
             } catch (\Throwable $e) {
@@ -135,7 +135,7 @@ abstract class Filter
                 \Illuminate\Support\Facades\Log::debug('Reflection error in filter attribute detection', [
                     'model' => get_class($model),
                     'field' => $field,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -161,8 +161,9 @@ abstract class Filter
             \Illuminate\Support\Facades\Log::warning('Error checking database column in filter', [
                 'model' => get_class($model),
                 'field' => $field,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }

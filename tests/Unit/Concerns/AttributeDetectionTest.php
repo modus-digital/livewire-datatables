@@ -20,6 +20,7 @@ class TestModelWithAccessor extends Model
 
     // Explicitly empty these to avoid Laravel's default behavior
     protected $fillable = [];
+
     protected $guarded = [];
 
     public function getAccessorFieldAttribute(): string
@@ -89,8 +90,8 @@ beforeEach(function () {
     // Clear cache before each test
     TestComponent::clearAttributeDetectionCache();
 
-    $this->testModel = new TestModelWithAccessor();
-    $this->testMainModel = new TestModelWithRelation();
+    $this->testModel = new TestModelWithAccessor;
+    $this->testMainModel = new TestModelWithRelation;
     $this->component = new TestComponent($this->testModel);
 });
 

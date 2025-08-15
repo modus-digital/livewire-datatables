@@ -199,8 +199,6 @@ class TextFilter extends Filter
         return $query;
     }
 
-
-
     public function render(): string
     {
         $placeholder = $this->placeholder ?? "Filter by {$this->name}";

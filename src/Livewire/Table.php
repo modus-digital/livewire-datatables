@@ -324,12 +324,12 @@ abstract class Table extends Component
             if (is_array($filterValue)) {
                 $matches = true;
 
-                if (!empty($filterValue['from'])) {
+                if (! empty($filterValue['from'])) {
                     $fromDate = \Carbon\Carbon::parse($filterValue['from'])->startOfDay();
                     $matches = $matches && $attributeDate->greaterThanOrEqualTo($fromDate);
                 }
 
-                if (!empty($filterValue['to'])) {
+                if (! empty($filterValue['to'])) {
                     $toDate = \Carbon\Carbon::parse($filterValue['to'])->endOfDay();
                     $matches = $matches && $attributeDate->lessThanOrEqualTo($toDate);
                 }
@@ -339,6 +339,7 @@ abstract class Table extends Component
 
             // Handle single date filtering
             $filterDate = \Carbon\Carbon::parse($filterValue);
+
             return $attributeDate->isSameDay($filterDate);
 
         } catch (\Throwable $e) {
@@ -346,8 +347,9 @@ abstract class Table extends Component
             \Illuminate\Support\Facades\Log::warning('Error in date attribute filtering', [
                 'attributeValue' => $attributeValue,
                 'filterValue' => $filterValue,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }

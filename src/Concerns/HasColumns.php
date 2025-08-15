@@ -174,16 +174,16 @@ trait HasColumns
             }
 
             // 2. Check if it's defined in the model's $appends array
-            if (!$isAttribute && in_array($field, $model->getAppends())) {
+            if (! $isAttribute && in_array($field, $model->getAppends())) {
                 $isAttribute = true;
             }
 
             // 3. Check if it's a cast attribute but NOT a database column
-            if (!$isAttribute && array_key_exists($field, $model->getCasts())) {
+            if (! $isAttribute && array_key_exists($field, $model->getCasts())) {
                 // Cast attributes can be both database columns AND computed attributes
                 // We need to check if it's actually a database column
                 try {
-                    if (!$this->isDatabaseColumn($model, $field)) {
+                    if (! $this->isDatabaseColumn($model, $field)) {
                         $isAttribute = true;
                     }
                 } catch (\Throwable $e) {
@@ -193,7 +193,7 @@ trait HasColumns
             }
 
             // 4. Check if it's a Laravel 9+ Attribute (new syntax)
-            if (!$isAttribute && method_exists($model, $field)) {
+            if (! $isAttribute && method_exists($model, $field)) {
                 try {
                     $reflection = new \ReflectionClass($model);
                     if ($reflection->hasMethod($field)) {
@@ -210,7 +210,7 @@ trait HasColumns
                     \Illuminate\Support\Facades\Log::debug('Reflection error in attribute detection', [
                         'model' => $modelClass,
                         'field' => $field,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
@@ -242,13 +242,13 @@ trait HasColumns
             \Illuminate\Support\Facades\Log::warning('Error in attribute detection', [
                 'model' => $modelClass,
                 'field' => $field,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             $isAttribute = false;
         }
 
         // Cache the result
-        if (!isset(static::$attributeDetectionCache[$modelClass])) {
+        if (! isset(static::$attributeDetectionCache[$modelClass])) {
             static::$attributeDetectionCache[$modelClass] = [];
         }
         static::$attributeDetectionCache[$modelClass][$field] = $isAttribute;
@@ -318,8 +318,9 @@ trait HasColumns
             \Illuminate\Support\Facades\Log::warning('Error checking database column', [
                 'model' => get_class($model),
                 'field' => $field,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -341,13 +342,13 @@ trait HasColumns
             $relationField = $parts[1];
 
             // Check if the relation method exists
-            if (!method_exists($model, $relationName)) {
+            if (! method_exists($model, $relationName)) {
                 return false;
             }
 
             // Get the related model
             $relatedModel = $this->getRelatedModel($relationshipPath);
-            if (!$relatedModel) {
+            if (! $relatedModel) {
                 return false;
             }
 
@@ -358,8 +359,9 @@ trait HasColumns
             // Log error and return false as fallback
             \Illuminate\Support\Facades\Log::warning('Error in relationship attribute detection', [
                 'relationshipPath' => $relationshipPath,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -378,12 +380,14 @@ trait HasColumns
         // Handle direct model attributes
         try {
             $model = $this->getModel();
+
             return $this->isModelAttribute($model, $field);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Error in field attribute detection', [
                 'field' => $field,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }

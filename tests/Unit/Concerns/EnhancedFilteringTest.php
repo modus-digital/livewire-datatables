@@ -3,9 +3,9 @@
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
-use ModusDigital\LivewireDatatables\Filters\TextFilter;
-use ModusDigital\LivewireDatatables\Filters\SelectFilter;
 use ModusDigital\LivewireDatatables\Filters\DateFilter;
+use ModusDigital\LivewireDatatables\Filters\SelectFilter;
+use ModusDigital\LivewireDatatables\Filters\TextFilter;
 
 // Test models
 class FilteringTestModel extends Model
@@ -26,7 +26,7 @@ class FilteringTestModel extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'active' => 'Active User',
             'inactive' => 'Inactive User',
             default => 'Unknown Status'
@@ -57,7 +57,7 @@ class RelatedFilteringModel extends Model
 }
 
 beforeEach(function () {
-    $this->testModel = new FilteringTestModel();
+    $this->testModel = new FilteringTestModel;
 });
 
 describe('enhanced text filtering with attribute detection', function () {
@@ -130,7 +130,7 @@ describe('enhanced text filtering with attribute detection', function () {
         $filter = TextFilter::make('Related Computed')->field('relatedModel.computed_name');
 
         // Mock the relationship
-        $relatedModel = new RelatedFilteringModel();
+        $relatedModel = new RelatedFilteringModel;
         $relationInstance = Mockery::mock(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
         $relationInstance->shouldReceive('getRelated')->andReturn($relatedModel);
 

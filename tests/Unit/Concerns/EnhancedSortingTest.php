@@ -87,7 +87,7 @@ class SortingTestComponent
 }
 
 beforeEach(function () {
-    $this->testModel = new SortingTestModel();
+    $this->testModel = new SortingTestModel;
     $this->component = new SortingTestComponent($this->testModel);
 });
 
@@ -126,7 +126,7 @@ describe('enhanced sorting with attribute detection', function () {
 
         // Create a mock model with a mocked relationship
         $mockModel = Mockery::mock(SortingTestModel::class)->makePartial();
-        $relatedModel = new RelatedSortingModel();
+        $relatedModel = new RelatedSortingModel;
         $relationInstance = Mockery::mock(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
         $relationInstance->shouldReceive('getRelated')->andReturn($relatedModel);
         $relationInstance->shouldReceive('getForeignKeyName')->andReturn('related_sorting_model_id');
@@ -153,7 +153,7 @@ describe('enhanced sorting with attribute detection', function () {
     it('flags attribute sorting for relationship attributes', function () {
         // Create a mock model with a mocked relationship
         $mockModel = Mockery::mock(SortingTestModel::class)->makePartial();
-        $relatedModel = new RelatedSortingModel();
+        $relatedModel = new RelatedSortingModel;
         $relationInstance = Mockery::mock(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
         $relationInstance->shouldReceive('getRelated')->andReturn($relatedModel);
 
@@ -179,10 +179,12 @@ describe('enhanced sorting with attribute detection', function () {
         $column = TextColumn::make('Custom Field')
             ->sortUsing(function ($query, $direction) use (&$customSortCalled) {
                 $customSortCalled = true;
+
                 return $query->orderBy('special_field', $direction);
             });
 
-        $component = new class($this->testModel, $column) extends SortingTestComponent {
+        $component = new class($this->testModel, $column) extends SortingTestComponent
+        {
             private $testColumn;
 
             public function __construct($model, $column)
@@ -196,6 +198,7 @@ describe('enhanced sorting with attribute detection', function () {
                 if ($field === 'custom_field') {
                     return $this->testColumn;
                 }
+
                 return parent::getColumn($field);
             }
 
@@ -220,7 +223,8 @@ describe('enhanced sorting with attribute detection', function () {
 
     it('uses default sorting when no sort field is set', function () {
         // Override default to use created_at instead of id to avoid cast issues
-        $component = new class($this->testModel) extends SortingTestComponent {
+        $component = new class($this->testModel) extends SortingTestComponent
+        {
             protected string $defaultSortField = 'created_at';
         };
 
@@ -282,12 +286,14 @@ describe('sorting error prevention', function () {
 
 describe('column integration', function () {
     it('uses custom sort field from column configuration', function () {
-        $component = new class($this->testModel) extends SortingTestComponent {
+        $component = new class($this->testModel) extends SortingTestComponent
+        {
             public function getColumn(string $field): ?TextColumn
             {
                 if ($field === 'custom_sort') {
                     return TextColumn::make('Custom')->field('custom_sort')->sortField('actual_database_field');
                 }
+
                 return parent::getColumn($field);
             }
 

@@ -1,21 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Schema;
-use ModusDigital\LivewireDatatables\Filters\TextFilter;
 use ModusDigital\LivewireDatatables\Columns\TextColumn;
-use ModusDigital\LivewireDatatables\Concerns\HasSorting;
-use ModusDigital\LivewireDatatables\Concerns\HasFilters;
 use ModusDigital\LivewireDatatables\Concerns\HasColumns;
+use ModusDigital\LivewireDatatables\Concerns\HasFilters;
+use ModusDigital\LivewireDatatables\Concerns\HasSorting;
+use ModusDigital\LivewireDatatables\Filters\TextFilter;
 
 // Simple test component
 class SimpleTestComponent
 {
-    use HasSorting, HasFilters, HasColumns;
+    use HasColumns, HasFilters, HasSorting;
 
     public function getModel(): \Illuminate\Database\Eloquent\Model
     {
-        return new class extends \Illuminate\Database\Eloquent\Model {
+        return new class extends \Illuminate\Database\Eloquent\Model
+        {
             protected $table = 'test_table';
+
             protected $appends = ['full_name'];
 
             public function getFullNameAttribute(): string
@@ -49,7 +51,7 @@ beforeEach(function () {
     Schema::shouldReceive('connection')->andReturnSelf();
     Schema::shouldReceive('getColumnListing')->with('test_table')->andReturn(['id', 'name', 'email']);
 
-    $this->component = new SimpleTestComponent();
+    $this->component = new SimpleTestComponent;
 });
 
 describe('simple integration tests', function () {

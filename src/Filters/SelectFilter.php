@@ -204,8 +204,6 @@ class SelectFilter extends Filter
         return $query;
     }
 
-
-
     public function render(): string
     {
         $placeholder = $this->placeholder ?? "Select {$this->name}";

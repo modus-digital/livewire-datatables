@@ -82,6 +82,7 @@ class DateFilter extends Filter
             if (! empty($value['to'])) {
                 $query->where($field, '<=', Carbon::parse($value['to'])->endOfDay());
             }
+
             return $query;
         }
 
