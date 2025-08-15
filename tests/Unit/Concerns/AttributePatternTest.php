@@ -147,7 +147,7 @@ it('works with TextFilter for any attributes', function () {
     // Test that TextFilter can handle any model attribute
     $filter = TextFilter::make('User Name')->field('user.fullName');
 
-    expect(method_exists($filter, 'isModelAttribute'))->toBeTrue();
+    expect(method_exists($filter, 'isFieldAttribute'))->toBeTrue();
     expect($filter)->toBeInstanceOf(TextFilter::class);
 });
 
@@ -157,7 +157,7 @@ it('works with SelectFilter for any attributes', function () {
         ->field('user.customAttribute')
         ->options(['Custom: John Doe' => 'John Doe', 'Custom: Jane Smith' => 'Jane Smith']);
 
-    expect(method_exists($filter, 'isModelAttribute'))->toBeTrue();
+    expect(method_exists($filter, 'isFieldAttribute'))->toBeTrue();
     expect($filter)->toBeInstanceOf(SelectFilter::class);
 });
 

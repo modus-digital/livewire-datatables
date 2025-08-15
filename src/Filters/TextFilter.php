@@ -90,13 +90,21 @@ class TextFilter extends Filter
             return $query;
         }
 
+        // Handle relationship fields with dot notation
         if (str_contains($this->field, '.')) {
             return $this->applyRelationshipFilter($query, $value);
         }
 
+        // Check if this is a model attribute before applying SQL filtering
+        $model = $query->getModel();
+        if ($this->isFieldAttribute($model, $this->field)) {
+            return $this->applyDirectAttributeFilter($query, $this->field, $value);
+        }
+
+        // Apply regular SQL filtering for database columns
         $field = $this->field;
         if (! str_contains($field, '.')) {
-            $field = $query->getModel()->getTable() . '.' . $field;
+            $field = $model->getTable() . '.' . $field;
         }
 
         return match ($this->operator) {
@@ -106,6 +114,30 @@ class TextFilter extends Filter
             'ends_with' => $query->where($field, 'like', "%{$value}"),
             default => $query->where($field, 'like', "%{$value}%"),
         };
+    }
+
+    /**
+     * Apply filter to a direct model attribute.
+     *
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     */
+    protected function applyDirectAttributeFilter(Builder $query, string $attributeField, mixed $value): Builder
+    {
+        // Set flag to indicate that attribute filtering is needed
+        $this->requiresAttributeFiltering = true;
+
+        // Store the filtering details for later use
+        $this->attributeFilterDetails = [
+            'relation' => null, // No relation for direct attributes
+            'field' => $attributeField,
+            'value' => $value,
+            'operator' => $this->operator,
+            'filter_field' => $this->field,
+        ];
+
+        // Return the query unchanged - the Table class will handle the filtering
+        return $query;
     }
 
     /**
@@ -125,8 +157,8 @@ class TextFilter extends Filter
             $relationInstance = $model->{$relation}();
             $relatedModel = $relationInstance->getRelated();
 
-            // Check if the field is a model attribute
-            if ($this->isModelAttribute($relatedModel, $field)) {
+            // Check if the field is a model attribute using enhanced detection
+            if ($this->isFieldAttribute($relatedModel, $field)) {
                 return $this->applyAttributeFilter($query, $relation, $field, $relatedModel, $value);
             }
         }
@@ -167,42 +199,7 @@ class TextFilter extends Filter
         return $query;
     }
 
-    /**
-     * Check if a field is a model attribute (accessor) rather than a database column.
-     */
-    protected function isModelAttribute(\Illuminate\Database\Eloquent\Model $model, string $field): bool
-    {
-        // Check if it's an accessor method (old Laravel syntax)
-        $accessorMethod = 'get' . \Illuminate\Support\Str::studly($field) . 'Attribute';
-        if (method_exists($model, $accessorMethod)) {
-            return true;
-        }
 
-        // Check if it's defined in the model's $appends array
-        if (in_array($field, $model->getAppends())) {
-            return true;
-        }
-
-        // Check if it's a cast attribute
-        if (array_key_exists($field, $model->getCasts())) {
-            return true;
-        }
-
-        // Check if it's a Laravel 9+ Attribute (new syntax)
-        if (method_exists($model, $field)) {
-            $reflection = new \ReflectionClass($model);
-            if ($reflection->hasMethod($field)) {
-                $method = $reflection->getMethod($field);
-                $returnType = $method->getReturnType();
-
-                if ($returnType instanceof \ReflectionNamedType && $returnType->getName() === 'Illuminate\Database\Eloquent\Casts\Attribute') {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     public function render(): string
     {

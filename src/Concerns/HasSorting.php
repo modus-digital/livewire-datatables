@@ -54,6 +54,7 @@ trait HasSorting
 
     /**
      * Apply sorting to the query.
+     * Enhanced version with attribute detection to prevent SQL errors.
      *
      * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return Builder<\Illuminate\Database\Eloquent\Model>
@@ -75,11 +76,23 @@ trait HasSorting
             return $callback($query, $sortDirection);
         }
 
-        $relationship = null;
+        // Determine the actual field to sort by
         if ($column) {
             $sortField = $column->getSortField();
+        }
 
-            // Check if the field contains dot notation (indicating a relationship)
+        // Check if we're dealing with a model attribute before proceeding with SQL sorting
+        if (method_exists($this, 'isFieldAttribute') && $this->isFieldAttribute($sortField)) {
+            // This field is a model attribute - flag for PHP-based sorting
+            $this->requiresAttributeSorting = true;
+
+            // Return the query unchanged - Table class will handle attribute sorting
+            return $query;
+        }
+
+        // Handle relationship fields
+        $relationship = null;
+        if ($column) {
             $columnField = $column->getField();
             if (str_contains($columnField, '.')) {
                 $relationship = $columnField;
@@ -94,6 +107,7 @@ trait HasSorting
             return $this->applySortingWithRelationship($query, $relationship, $sortDirection);
         }
 
+        // Apply regular SQL sorting for database columns
         if (! str_contains($sortField, '.')) {
             $sortField = $query->getModel()->getTable() . '.' . $sortField;
         }
