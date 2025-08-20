@@ -2,6 +2,15 @@
 
 All notable changes to `livewire-datatables` will be documented in this file.
 
+## 1.2.4 - 2025-08-20
+
+### What's Changed
+
+* Bump aglipanci/laravel-pint-action from 2.5 to 2.6 by @dependabot[bot] in https://github.com/modus-digital/livewire-datatables/pull/25
+* Fixing sorting bug (relations and attributes) by @AlexVanSteenhoven in https://github.com/modus-digital/livewire-datatables/pull/26
+
+**Full Changelog**: https://github.com/modus-digital/livewire-datatables/compare/1.2.3...1.2.4
+
 ## 1.2.3 - 2025-07-09
 
 ### What's Changed
