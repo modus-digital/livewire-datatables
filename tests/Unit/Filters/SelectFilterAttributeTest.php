@@ -47,8 +47,8 @@ it('supports multiple selection', function () {
 it('has attribute detection methods', function () {
     $filter = SelectFilter::make('User Name')->field('user.name');
 
-    expect(method_exists($filter, 'isModelAttribute'))->toBeTrue();
-    // The filter now uses a simpler approach - no hardcoded methods needed
+    expect(method_exists($filter, 'isFieldAttribute'))->toBeTrue();
+    // The filter now uses enhanced attribute detection in the base Filter class
     expect($filter)->toBeInstanceOf(SelectFilter::class);
 });
 

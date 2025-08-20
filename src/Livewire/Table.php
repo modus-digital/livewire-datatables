@@ -230,6 +230,7 @@ abstract class Table extends Component
 
     /**
      * Filter a collection by model attributes.
+     * Enhanced version supporting both direct and relationship attributes.
      *
      * @param  Collection<int, Model>  $collection
      * @return Collection<int, Model>
@@ -249,7 +250,19 @@ abstract class Table extends Component
                 $filterValue = $filterDetails['value'];
                 $operator = $filterDetails['operator'] ?? 'like';
                 $multiple = $filterDetails['multiple'] ?? false;
+                $filterType = $filterDetails['type'] ?? 'text';
 
+                // Handle direct model attributes (no relation)
+                if (is_null($relationName)) {
+                    $attributeValue = $this->getModelAttributeValue($model, $attributeField);
+
+                    if (! $this->matchesAttributeFilter($attributeValue, $filterValue, $operator, $multiple, $filterType)) {
+                        return false;
+                    }
+                    continue;
+                }
+
+                // Handle relationship attributes
                 $relatedModel = $model->{$relationName};
                 if (! $relatedModel) {
                     return false;
@@ -258,7 +271,7 @@ abstract class Table extends Component
                 $attributeValue = $this->getModelAttributeValue($relatedModel, $attributeField);
 
                 // Apply the filter based on operator
-                if (! $this->matchesAttributeFilter($attributeValue, $filterValue, $operator, $multiple)) {
+                if (! $this->matchesAttributeFilter($attributeValue, $filterValue, $operator, $multiple, $filterType)) {
                     return false;
                 }
             }
@@ -269,18 +282,26 @@ abstract class Table extends Component
 
     /**
      * Check if an attribute value matches the filter criteria.
+     * Enhanced version supporting different filter types.
      */
-    protected function matchesAttributeFilter(mixed $attributeValue, mixed $filterValue, string $operator, bool $multiple): bool
+    protected function matchesAttributeFilter(mixed $attributeValue, mixed $filterValue, string $operator, bool $multiple, string $filterType = 'text'): bool
     {
         if ($attributeValue === null) {
             return false;
         }
 
-        $attributeString = (string) $attributeValue;
+        // Handle date filtering
+        if ($filterType === 'date') {
+            return $this->matchesDateAttributeFilter($attributeValue, $filterValue, $operator);
+        }
 
+        // Handle multiple select filtering
         if ($multiple && is_array($filterValue)) {
             return in_array($attributeValue, $filterValue);
         }
+
+        // Handle text filtering
+        $attributeString = (string) $attributeValue;
 
         return match ($operator) {
             '=' => $attributeString === (string) $filterValue,
@@ -289,6 +310,48 @@ abstract class Table extends Component
             'ends_with' => str_ends_with(strtolower($attributeString), strtolower((string) $filterValue)),
             default => str_contains(strtolower($attributeString), strtolower((string) $filterValue)),
         };
+    }
+
+    /**
+     * Check if an attribute value matches date filter criteria.
+     */
+    protected function matchesDateAttributeFilter(mixed $attributeValue, mixed $filterValue, string $operator): bool
+    {
+        try {
+            $attributeDate = \Carbon\Carbon::parse($attributeValue);
+
+            // Handle date range filtering
+            if (is_array($filterValue)) {
+                $matches = true;
+
+                if (! empty($filterValue['from'])) {
+                    $fromDate = \Carbon\Carbon::parse($filterValue['from'])->startOfDay();
+                    $matches = $matches && $attributeDate->greaterThanOrEqualTo($fromDate);
+                }
+
+                if (! empty($filterValue['to'])) {
+                    $toDate = \Carbon\Carbon::parse($filterValue['to'])->endOfDay();
+                    $matches = $matches && $attributeDate->lessThanOrEqualTo($toDate);
+                }
+
+                return $matches;
+            }
+
+            // Handle single date filtering
+            $filterDate = \Carbon\Carbon::parse($filterValue);
+
+            return $attributeDate->isSameDay($filterDate);
+
+        } catch (\Throwable $e) {
+            // Log error and return false as fallback
+            \Illuminate\Support\Facades\Log::warning('Error in date attribute filtering', [
+                'attributeValue' => $attributeValue,
+                'filterValue' => $filterValue,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     /**
