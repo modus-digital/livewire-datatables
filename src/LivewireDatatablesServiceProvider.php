@@ -20,6 +20,7 @@ class LivewireDatatablesServiceProvider extends PackageServiceProvider
         $package
             ->name('livewire-datatables')
             ->hasViews()
+            ->hasConfigFile()
             ->hasCommand(LivewireDatatablesCommand::class);
     }
 }
