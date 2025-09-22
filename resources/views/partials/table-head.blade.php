@@ -1,5 +1,7 @@
 @use('ModusDigital\LivewireDatatables\Enums\Align')
 
+@php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
+
 <thead class="bg-gray-50 dark:bg-gray-800 mx-4">
     <tr>
         @if ($this->hasSelection())
@@ -40,13 +42,13 @@
                         <span class="ml-2">
                             @if($this->isSorted($column->getField()))
                                 @if($this->sortDirection === 'asc')
-                                    <svg class="h-4 w-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="{{ 'h-4 w-4 ' . $colors['text'] }}" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
                                             clip-rule="evenodd" />
                                     </svg>
                                 @else
-                                    <svg class="h-4 w-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="{{ 'h-4 w-4 ' . $colors['text'] }}" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                             clip-rule="evenodd" />

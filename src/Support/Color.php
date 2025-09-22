@@ -43,53 +43,53 @@ class Color
             ],
 
             ColorEnum::GREEN => [
-                'text' => 'text-green-500 dark:text-green-400 hover:text-green-600 dark:hover:text-green-300',
-                'background' => 'bg-green-50 dark:bg-green-900/50 hover:bg-green-100 dark:hover:bg-green-900/60',
+                'text' => 'text-green-400 dark:text-green-500 hover:text-green-300 dark:hover:text-green-600',
+                'background' => 'bg-green-900/50 dark:bg-green-900 hover:bg-green-900/60 dark:hover:bg-green-900',
             ],
 
             ColorEnum::BLUE => [
-                'text' => 'text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300',
-                'background' => 'bg-blue-50 dark:bg-blue-900/50 hover:bg-blue-100 dark:hover:bg-blue-900/60',
+                'text' => 'text-blue-400 dark:text-blue-500 hover:text-blue-300 dark:hover:text-blue-600',
+                'background' => 'bg-blue-900/50 dark:bg-blue-900 hover:bg-blue-900/60 dark:hover:bg-blue-900',
             ],
 
             ColorEnum::INDIGO => [
-                'text' => 'text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300',
-                'background' => 'bg-indigo-50 dark:bg-indigo-900/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60',
+                'text' => 'text-indigo-400 dark:text-indigo-500 hover:text-indigo-300 dark:hover:text-indigo-600',
+                'background' => 'bg-indigo-900/50 dark:bg-indigo-900 hover:bg-indigo-900/60 dark:hover:bg-indigo-900',
             ],
 
             ColorEnum::PURPLE => [
-                'text' => 'text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300',
-                'background' => 'bg-purple-50 dark:bg-purple-900/50 hover:bg-purple-100 dark:hover:bg-purple-900/60',
+                'text' => 'text-purple-400 dark:text-purple-500 hover:text-purple-300 dark:hover:text-purple-600',
+                'background' => 'bg-purple-900/50 dark:bg-purple-900 hover:bg-purple-900/60 dark:hover:bg-purple-900',
             ],
 
             ColorEnum::PINK => [
-                'text' => 'text-pink-500 dark:text-pink-400 hover:text-pink-600 dark:hover:text-pink-300',
-                'background' => 'bg-pink-50 dark:bg-pink-900/50 hover:bg-pink-100 dark:hover:bg-pink-900/60',
+                'text' => 'text-pink-400 dark:text-pink-500 hover:text-pink-300 dark:hover:text-pink-600',
+                'background' => 'bg-pink-900/50 dark:bg-pink-900 hover:bg-pink-900/60 dark:hover:bg-pink-900',
             ],
 
             ColorEnum::TEAL => [
-                'text' => 'text-teal-500 dark:text-teal-400 hover:text-teal-600 dark:hover:text-teal-300',
-                'background' => 'bg-teal-50 dark:bg-teal-900/50 hover:bg-teal-100 dark:hover:bg-teal-900/60',
+                'text' => 'text-teal-400 dark:text-teal-500 hover:text-teal-300 dark:hover:text-teal-600',
+                'background' => 'bg-teal-900/50 dark:bg-teal-900 hover:bg-teal-900/60 dark:hover:bg-teal-900',
             ],
 
             ColorEnum::CYAN => [
-                'text' => 'text-cyan-500 dark:text-cyan-400 hover:text-cyan-600 dark:hover:text-cyan-300',
-                'background' => 'bg-cyan-50 dark:bg-cyan-900/50 hover:bg-cyan-100 dark:hover:bg-cyan-900/60',
+                'text' => 'text-cyan-400 dark:text-cyan-500 hover:text-cyan-300 dark:hover:text-cyan-600',
+                'background' => 'bg-cyan-900/50 dark:bg-cyan-900 hover:bg-cyan-900/60 dark:hover:bg-cyan-900',
             ],
 
             ColorEnum::LIME => [
-                'text' => 'text-lime-500 dark:text-lime-400 hover:text-lime-600 dark:hover:text-lime-300',
-                'background' => 'bg-lime-50 dark:bg-lime-900/50 hover:bg-lime-100 dark:hover:bg-lime-900/60',
+                'text' => 'text-lime-400 dark:text-lime-500 hover:text-lime-300 dark:hover:text-lime-600',
+                'background' => 'bg-lime-900/50 dark:bg-lime-900 hover:bg-lime-900/60 dark:hover:bg-lime-900',
             ],
 
             ColorEnum::EMERALD => [
-                'text' => 'text-emerald-500 dark:text-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-300',
-                'background' => 'bg-emerald-50 dark:bg-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60',
+                'text' => 'text-emerald-400 dark:text-emerald-500 hover:text-emerald-300 dark:hover:text-emerald-600',
+                'background' => 'bg-emerald-900/50 dark:bg-emerald-900 hover:bg-emerald-900/60 dark:hover:bg-emerald-900',
             ],
 
             ColorEnum::SKY => [
-                'text' => 'text-sky-500 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300',
-                'background' => 'bg-sky-50 dark:bg-sky-900/50 hover:bg-sky-100 dark:hover:bg-sky-900/60',
+                'text' => 'text-sky-400 dark:text-sky-500 hover:text-sky-300 dark:hover:text-sky-600',
+                'background' => 'bg-sky-900/50 dark:bg-sky-900 hover:bg-sky-900/60 dark:hover:bg-sky-900',
             ]
         };
     }

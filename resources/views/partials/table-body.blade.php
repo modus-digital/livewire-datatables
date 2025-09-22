@@ -1,11 +1,12 @@
 <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+    @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
     @forelse($rows as $row)
         <tr @class([
             'hover:bg-gray-50 dark:hover:bg-gray-700 py-4',
-            'bg-indigo-50 dark:bg-indigo-900/50' => $this->hasSelection() && $this->isSelected($row->id),
+            $colors['background'] => $this->hasSelection() && $this->isSelected($row->id),
             'cursor-pointer' => $this->hasShowRecord()
-        ])
-            wire:key="row-{{ $row->id }}" @if($this->hasShowRecord())
+        ]) wire:key="row-{{ $row->id }}"
+            @if($this->hasShowRecord())
             wire:click="showRecord({{ is_string($row->id) ? '\'' . $row->id . '\'' : $row->id }})" @endif>
             @if($this->hasSelection())
                 <td class="relative px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">

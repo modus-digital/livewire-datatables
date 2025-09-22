@@ -6,6 +6,8 @@
         ->values();
 @endphp
 
+@php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
+
 <div class="relative" x-data="{
     open: false,
     query: '',
@@ -105,10 +107,10 @@
             </template>
             <template x-for="(label, idx) in selectedLabels()" :key="label + '-' + idx">
                 <span
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200 text-xs">
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs {{ $colors['background'] }} {{ $colors['text'] }}">
                     <span x-text="label"></span>
                     <template x-if="multiple">
-                        <button type="button" class="text-indigo-500 hover:text-indigo-700"
+                        <button type="button" class="{{ $colors['text'] }}"
                             x-on:click.stop="toggleOption(selected[idx])">
                             &times;
                         </button>
@@ -119,7 +121,7 @@
         <div class="flex items-center gap-2">
             <template x-if="multiple && selectedCount() > 0">
                 <span
-                    class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium bg-indigo-600 text-white"
+                    class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium {{ $colors['background'] }} text-white"
                     x-text="selectedCount()"></span>
             </template>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" viewBox="0 0 20 20"
@@ -149,8 +151,8 @@
                     x-on:click="toggleOption(opt.value)">
                     <span x-text="opt.label"></span>
                     <span class="ml-2" x-show="isSelected(opt.value)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" viewBox="0 0 20 20"
-                            fill="currentColor" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 {{ $colors['text'] }}"
+                            viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd"
                                 d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.364a1 1 0 0 1-1.437 0L3.29 9.03a1 1 0 1 1 1.42-1.408l3.03 3.05 6.54-6.625a1 1 0 0 1 1.424.244Z"
                                 clip-rule="evenodd" />
@@ -163,7 +165,7 @@
             x-show="multiple">
             <button type="button" class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
                 x-on:click="clearAll()">Alles wissen</button>
-            <button type="button" class="text-xs text-indigo-600 hover:underline"
+            <button type="button" class="text-xs {{ $colors['text'] }} hover:underline"
                 x-on:click="open = false">Gereed</button>
         </div>
     </div>

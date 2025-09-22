@@ -1,4 +1,7 @@
 <div class="flex items-center justify-between gap-4 space-y-4">
+    @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
+    @php($baseColor = \ModusDigital\LivewireDatatables\Support\Color::get()->value)
+    @php($defaultButtonClasses = 'bg-' . $baseColor . '-600 hover:bg-' . $baseColor . '-700 text-white')
     <div class="flex items-center gap-2">
 
         @if($this->isSearchable())
@@ -28,7 +31,7 @@
             <button wire:click="executeAction('{{ $action->getKey() }}')" @if($action->getConfirmMessage())
             onclick="return confirm('{{ $action->getConfirmMessage() }}')" @endif @class([
                     'px-4 py-2 text-sm font-medium rounded-md',
-                    'bg-indigo-600 hover:bg-indigo-700 text-white' => !$action->getClass(),
+                    $defaultButtonClasses => !$action->getClass(),
                     $action->getClass() => $action->getClass()
                 ])>
                 @if($action->getIcon())

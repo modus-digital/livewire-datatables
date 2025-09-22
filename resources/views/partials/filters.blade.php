@@ -1,4 +1,5 @@
 @if(config('livewire-datatables.filters.style') === 'popup')
+@php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
     <div class="relative z-[9999] flex justify-end">
         <details class="relative">
             @php
@@ -16,7 +17,7 @@
                 <span>Filters</span>
                 @if($activeFilterCount > 0)
                     <span
-                        class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium bg-indigo-600 text-white">
+                        class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium {{ $colors['background'] }} text-white">
                         {{ $activeFilterCount }}
                     </span>
                 @endif
@@ -32,7 +33,8 @@
                 </div>
                 @if($this->hasActiveFilters())
                     <div class="mt-3 text-right">
-                        <a href="#" wire:click.prevent="resetFilters" class="text-xs text-indigo-600 hover:underline">Clear
+                        <a href="#" wire:click.prevent="resetFilters"
+                            class="text-xs {{ $colors['text'] }} hover:underline">Clear
                             filters</a>
                     </div>
                 @endif
@@ -40,11 +42,11 @@
         </details>
     </div>
 @else
-    <div class="flex flex-wrap gap-4 items-end">
-        @foreach($this->getFilters() as $filter)
-            <div class="flex-1 min-w-[200px]">
-                {!! $filter->render() !!}
-            </div>
-        @endforeach
-    </div>
+<div class="flex flex-wrap gap-4 items-end">
+    @foreach($this->getFilters() as $filter)
+        <div class="flex-1 min-w-[200px]">
+            {!! $filter->render() !!}
+        </div>
+    @endforeach
+</div>
 @endif

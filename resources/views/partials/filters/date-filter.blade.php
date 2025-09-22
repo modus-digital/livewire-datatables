@@ -159,6 +159,7 @@
         return grid;
     }
 }" x-on:keydown.escape.window="open = false" x-cloak>
+    @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
     @unless ($hideLabel)
         <label class="block text-base font-medium leading-6 text-gray-900 dark:text-white mb-1">
             {{ $name }}
@@ -187,11 +188,11 @@
             <template x-if="isRange && (selectedFrom || selectedTo)">
                 <div class="flex items-center gap-2">
                     <span
-                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200 text-xs"
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs {{ $colors['background'] }} {{ $colors['text'] }}"
                         x-show="selectedFrom" x-text="selectedFrom"></span>
                     <span class="text-gray-400">–</span>
                     <span
-                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200 text-xs"
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs {{ $colors['background'] }} {{ $colors['text'] }}"
                         x-show="selectedTo" x-text="selectedTo"></span>
                 </div>
             </template>
@@ -240,7 +241,7 @@
             <div class="flex items-center gap-2">
                 <button type="button" class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
                     x-on:click="clear()">Clear</button>
-                <button type="button" class="text-xs text-indigo-600 hover:underline" x-on:click="open=false"
+                <button type="button" class="text-xs {{ $colors['text'] }} hover:underline" x-on:click="open=false"
                     x-show="!isRange">Done</button>
             </div>
         </div>
@@ -259,9 +260,9 @@
                                    text-gray-700 dark:text-gray-100
                                    hover:bg-gray-100 dark:hover:bg-gray-700
                                   " :class="{
-                                'bg-indigo-600 text-white': (!isRange && isSameDayStr(cell.iso, selectedSingle)),
-                                'bg-indigo-600/90 text-white': (isRange && (isSameDayStr(cell.iso, selectedFrom) || isSameDayStr(cell.iso, selectedTo))),
-                                'bg-indigo-500/20 text-indigo-900 dark:text-indigo-200': (isRange && isBetween(cell.iso, selectedFrom, selectedTo) && !isSameDayStr(cell.iso, selectedFrom) && !isSameDayStr(cell.iso, selectedTo)),
+                                '{{ $colors['background'] }} text-white': (!isRange && isSameDayStr(cell.iso, selectedSingle)),
+                                '{{ $colors['background'] }} text-white': (isRange && (isSameDayStr(cell.iso, selectedFrom) || isSameDayStr(cell.iso, selectedTo))),
+                                '{{ $colors['background'] }} {{ $colors['text'] }}': (isRange && isBetween(cell.iso, selectedFrom, selectedTo) && !isSameDayStr(cell.iso, selectedFrom) && !isSameDayStr(cell.iso, selectedTo)),
                             }" x-text="cell.label" x-on:click="selectDate(cell.iso)"></button>
                     </template>
                 </div>
@@ -273,15 +274,15 @@
                 <div class="flex items-center gap-2">
                     <span class="text-xs text-gray-600 dark:text-gray-300">From</span>
                     <span
-                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200 text-xs min-w-[6rem] text-center"
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs min-w-[6rem] text-center {{ $colors['background'] }} {{ $colors['text'] }}"
                         x-text="selectedFrom || '—'"></span>
                     <span class="text-xs text-gray-600 dark:text-gray-300">To</span>
                     <span
-                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-200 text-xs min-w-[6rem] text-center"
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs min-w-[6rem] text-center {{ $colors['background'] }} {{ $colors['text'] }}"
                         x-text="selectedTo || '—'"></span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" class="text-xs text-indigo-600 hover:underline"
+                    <button type="button" class="text-xs {{ $colors['text'] }} hover:underline"
                         x-on:click="open=false">Apply</button>
                 </div>
             </div>
