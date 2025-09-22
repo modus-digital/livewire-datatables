@@ -133,6 +133,7 @@ trait HasFilters
     {
         $this->filters = [];
         $this->resetPage();
+        $this->dispatch('filters-cleared');
     }
 
     /**
@@ -143,6 +144,7 @@ trait HasFilters
         // Handle dotted field names by using data_forget for nested arrays
         data_forget($this->filters, $field);
         $this->resetPage();
+        $this->dispatch('filter-cleared', field: $field);
     }
 
     /**
