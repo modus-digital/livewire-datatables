@@ -6,6 +6,7 @@ namespace ModusDigital\LivewireDatatables\Columns;
 
 use Closure;
 use Deprecated;
+use ModusDigital\LivewireDatatables\Enums\Align;
 use Illuminate\Support\Str;
 
 class Column
@@ -30,7 +31,7 @@ class Column
 
     protected ?string $width = null;
 
-    protected ?string $align = null;
+    protected Align|string $align = Align::LEFT;
 
     protected ?string $view = null;
 
@@ -185,9 +186,9 @@ class Column
     /**
      * Set the column text alignment.
      *
-     * @param  string  $align  The alignment (left, center, right)
+     * @param  Align|string  $align  The alignment (left, center, right)
      */
-    public function align(string $align): self
+    public function align(Align|string $align): self
     {
         $this->align = $align;
 
@@ -277,11 +278,15 @@ class Column
     /**
      * Get the column text alignment.
      *
-     * @return string|null The alignment or null if not set
+     * @return Align The alignment or null if not set
      */
-    public function getAlign(): ?string
+    public function getAlign(): Align
     {
-        return $this->align;
+        if ($this->align instanceof Align) {
+            return $this->align;
+        }
+
+        return Align::tryFrom($this->align) ?? Align::LEFT;
     }
 
     /**
