@@ -10,7 +10,7 @@
     @endif
 
     @if(count($this->getFilters()) && config('livewire-datatables.filters.style') !== 'popup')
-        <div @class(['px-6 py-4 mb-4', 'overflow-x-auto' => config('livewire-datatables.filters.style') !== 'popup'])>
+        <div @class(['px-6 py-4 mb-4'])>
             @include('livewire-datatables::partials.filters')
         </div>
     @endif
