@@ -16,7 +16,7 @@ abstract class Filter
 
     protected ?string $placeholder = null;
 
-	protected ?bool $hideLabel = null;
+    protected ?bool $hideLabel = null;
 
     public function __construct(string $name)
     {
@@ -77,14 +77,14 @@ abstract class Filter
         return $this->placeholder;
     }
 
-	public function shouldHideLabel(): bool
-	{
-		if ($this->hideLabel === null) {
-			$this->hideLabel = (bool) config('livewire-datatables.filters.labels', false);
-		}
+    public function shouldHideLabel(): bool
+    {
+        if ($this->hideLabel === null) {
+            $this->hideLabel = (bool) config('livewire-datatables.filters.labels', false);
+        }
 
-		return $this->hideLabel;
-	}
+        return $this->hideLabel;
+    }
 
     /**
      * Get the attribute filtering details.

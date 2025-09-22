@@ -26,7 +26,7 @@ class Color
         $baseColor = self::get();
 
         // Standaard Tailwind kleuren als voorbeeld, kan uitgebreid worden
-        return match($baseColor) {
+        return match ($baseColor) {
             ColorEnum::RED => [
                 'text' => 'text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300',
                 'background' => 'bg-red-50 dark:bg-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60',

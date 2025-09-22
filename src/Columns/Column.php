@@ -6,8 +6,8 @@ namespace ModusDigital\LivewireDatatables\Columns;
 
 use Closure;
 use Deprecated;
-use ModusDigital\LivewireDatatables\Enums\Align;
 use Illuminate\Support\Str;
+use ModusDigital\LivewireDatatables\Enums\Align;
 
 class Column
 {

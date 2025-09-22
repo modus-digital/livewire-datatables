@@ -11,7 +11,7 @@ trait HasRowSelection
 
     public bool $selectAll = false;
 
-	public ?bool $showSelection = null;
+    public ?bool $showSelection = null;
 
     /**
      * Toggle selection for a specific row.
@@ -89,11 +89,11 @@ trait HasRowSelection
      */
     public function hasSelection(): bool
     {
-		if ($this->showSelection === null) {
-			$this->showSelection = (bool) config('livewire-datatables.checkboxes', true);
-		}
+        if ($this->showSelection === null) {
+            $this->showSelection = (bool) config('livewire-datatables.checkboxes', true);
+        }
 
-		return $this->showSelection;
+        return $this->showSelection;
     }
 
     /**
