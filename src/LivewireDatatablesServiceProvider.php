@@ -23,4 +23,13 @@ class LivewireDatatablesServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasCommand(LivewireDatatablesCommand::class);
     }
+
+    public function packageBooted(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../resources/dist' => public_path('vendor/livewire-datatables'),
+            ], 'livewire-datatables-assets');
+        }
+    }
 }
