@@ -80,7 +80,7 @@ abstract class Filter
     public function shouldHideLabel(): bool
     {
         if ($this->hideLabel === null) {
-            $this->hideLabel = (bool) config('livewire-datatables.filters.labels', false);
+            $this->hideLabel = ! (bool) config('livewire-datatables.filters.labels', false);
         }
 
         return $this->hideLabel;

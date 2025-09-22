@@ -207,6 +207,7 @@ class TextFilter extends Filter
             'name' => $this->name,
             'field' => $this->field,
             'placeholder' => $placeholder,
+            'hideLabel' => $this->shouldHideLabel(),
         ])->render();
     }
 }

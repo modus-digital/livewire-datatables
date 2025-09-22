@@ -90,7 +90,7 @@ trait HasRowSelection
     public function hasSelection(): bool
     {
         if ($this->showSelection === null) {
-            $this->showSelection = (bool) config('livewire-datatables.checkboxes', true);
+            $this->showSelection = (bool) config('livewire-datatables.checkboxes', false);
         }
 
         return $this->showSelection;

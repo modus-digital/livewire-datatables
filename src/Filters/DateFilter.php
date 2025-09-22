@@ -191,6 +191,7 @@ class DateFilter extends Filter
             'name' => $this->name,
             'field' => $this->field,
             'isRange' => $this->range,
+            'hideLabel' => $this->shouldHideLabel(),
         ])->render();
     }
 }

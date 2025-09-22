@@ -214,6 +214,7 @@ class SelectFilter extends Filter
             'placeholder' => $placeholder,
             'options' => $this->options,
             'multiple' => $this->multiple,
+            'hideLabel' => $this->shouldHideLabel(),
         ])->render();
     }
 }
