@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ModusDigital\LivewireDatatables\Tests;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class TestServiceProvider extends ServiceProvider
 {

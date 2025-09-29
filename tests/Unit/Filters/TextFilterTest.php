@@ -30,7 +30,7 @@ class TFAccount extends \Illuminate\Database\Eloquent\Model
 }
 
 it('TextFilter exact/contains/startsWith/endsWith SQL op normale kolom', function () {
-    $query = (new TFUser())->newQuery();
+    $query = (new TFUser)->newQuery();
 
     // contains
     $f = TextFilter::make('first_name')->contains();
@@ -41,7 +41,7 @@ it('TextFilter exact/contains/startsWith/endsWith SQL op normale kolom', functio
         ->and($bindings[count($bindings) - 1])->toBe('%John%');
 
     // startsWith
-    $query = (new TFUser())->newQuery();
+    $query = (new TFUser)->newQuery();
     $f = TextFilter::make('first_name')->startsWith();
     $f->apply($query, 'Jo');
     $sql = $query->toSql();
@@ -50,7 +50,7 @@ it('TextFilter exact/contains/startsWith/endsWith SQL op normale kolom', functio
         ->and($bindings[count($bindings) - 1])->toBe('Jo%');
 
     // endsWith
-    $query = (new TFUser())->newQuery();
+    $query = (new TFUser)->newQuery();
     $f = TextFilter::make('first_name')->endsWith();
     $f->apply($query, 'hn');
     $sql = $query->toSql();
@@ -59,7 +59,7 @@ it('TextFilter exact/contains/startsWith/endsWith SQL op normale kolom', functio
         ->and($bindings[count($bindings) - 1])->toBe('%hn');
 
     // exact
-    $query = (new TFUser())->newQuery();
+    $query = (new TFUser)->newQuery();
     $f = TextFilter::make('first_name')->exact();
     $f->apply($query, 'John');
     $sql = $query->toSql();
@@ -69,7 +69,7 @@ it('TextFilter exact/contains/startsWith/endsWith SQL op normale kolom', functio
 });
 
 it('TextFilter relatiepad met whereHas', function () {
-    $query = (new TFUser())->newQuery();
+    $query = (new TFUser)->newQuery();
     $f = TextFilter::make('account.name')->contains();
     $f->apply($query, 'Acme');
     $sql = $query->toSql();
@@ -80,14 +80,14 @@ it('TextFilter relatiepad met whereHas', function () {
 
 it('TextFilter attribute-pad zet requiresAttributeFiltering en geen SQL where', function () {
     // direct attribute
-    $query = (new TFUser())->newQuery();
+    $query = (new TFUser)->newQuery();
     $f = TextFilter::make('display_name')->contains();
     $f->apply($query, 'Jane');
     expect($f->requiresAttributeFiltering())->toBeTrue()
         ->and($query->toSql())->not->toContain('where');
 
     // relatie attribute
-    $query = (new TFUser())->newQuery();
+    $query = (new TFUser)->newQuery();
     $f = TextFilter::make('account.slug')->contains();
     $f->apply($query, 'acme');
     expect($f->requiresAttributeFiltering())->toBeTrue()

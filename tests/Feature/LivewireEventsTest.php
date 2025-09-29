@@ -5,7 +5,10 @@ declare(strict_types=1);
 use Livewire\Livewire;
 use ModusDigital\LivewireDatatables\Livewire\Table;
 
-class EventUserModel extends \Illuminate\Database\Eloquent\Model { protected $table = 'users'; }
+class EventUserModel extends \Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'users';
+}
 
 class EventTable extends Table
 {

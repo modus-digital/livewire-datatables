@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Carbon\Carbon;
 use ModusDigital\LivewireDatatables\Filters\DateFilter;
 
 class DFUser extends \Illuminate\Database\Eloquent\Model
@@ -31,7 +30,7 @@ class DFCompany extends \Illuminate\Database\Eloquent\Model
 }
 
 it('DateFilter single date op normale kolom', function () {
-    $query = (new DFUser())->newQuery();
+    $query = (new DFUser)->newQuery();
     $f = DateFilter::make('created_at');
     $f->apply($query, '2023-01-02');
     $sql = $query->toSql();
@@ -40,7 +39,7 @@ it('DateFilter single date op normale kolom', function () {
 });
 
 it('DateFilter range from/to op normale kolom', function () {
-    $query = (new DFUser())->newQuery();
+    $query = (new DFUser)->newQuery();
     $f = DateFilter::make('created_at')->range();
     $f->apply($query, ['from' => '2023-01-01', 'to' => '2023-01-31']);
     $sql = $query->toSql();
@@ -49,7 +48,7 @@ it('DateFilter range from/to op normale kolom', function () {
 });
 
 it('DateFilter relatiepad met whereHas', function () {
-    $query = (new DFUser())->newQuery();
+    $query = (new DFUser)->newQuery();
     $f = DateFilter::make('company.joined_on');
     $f->apply($query, '2023-01-01');
     $sql = $query->toSql();
@@ -60,14 +59,14 @@ it('DateFilter relatiepad met whereHas', function () {
 
 it('DateFilter attribute-pad zet requiresAttributeFiltering en geen SQL where', function () {
     // direct attribute
-    $query = (new DFUser())->newQuery();
+    $query = (new DFUser)->newQuery();
     $f = DateFilter::make('signed_up_at');
     $f->apply($query, '2023-01-01');
     expect($f->requiresAttributeFiltering())->toBeTrue()
         ->and($query->toSql())->not->toContain('where');
 
     // relatie attribute
-    $query = (new DFUser())->newQuery();
+    $query = (new DFUser)->newQuery();
     $f = DateFilter::make('company.established_on');
     $f->apply($query, '2023-01-01');
     expect($f->requiresAttributeFiltering())->toBeTrue()

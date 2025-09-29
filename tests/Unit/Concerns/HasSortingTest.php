@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Illuminate\Database\Eloquent\Builder;
 use ModusDigital\LivewireDatatables\Columns\Column;
 use ModusDigital\LivewireDatatables\Livewire\Table;
 
@@ -42,7 +41,7 @@ class DummyHasSortingTable extends Table
 }
 
 it('sortBy togglet richting en wijzigt veld; non-sortable doet niets', function () {
-    $t = new DummyHasSortingTable();
+    $t = new DummyHasSortingTable;
     $t->sortBy('first_name');
     expect($t->sortField)->toBe('first_name')->and($t->sortDirection)->toBe('asc');
 
@@ -58,17 +57,17 @@ it('sortBy togglet richting en wijzigt veld; non-sortable doet niets', function 
 });
 
 it('applySorting gewone kolom prefix met tabelnaam', function () {
-    $t = new DummyHasSortingTable();
+    $t = new DummyHasSortingTable;
     $t->sortBy('first_name');
-    $query = (new HSUser())->newQuery();
+    $query = (new HSUser)->newQuery();
     $t->applySorting($query);
     expect($query->toSql())->toContain('order by "users"."first_name" asc');
 });
 
 it('applySorting relatie join (BelongsTo) en één JOIN per tabel', function () {
-    $t = new DummyHasSortingTable();
+    $t = new DummyHasSortingTable;
     $t->sortBy('account.name');
-    $query = (new HSUser())->newQuery();
+    $query = (new HSUser)->newQuery();
     $t->applySorting($query);
     $sql = $query->toSql();
     expect($sql)->toContain('left join "accounts"')
@@ -84,16 +83,16 @@ it('applySorting relatie join (BelongsTo) en één JOIN per tabel', function () 
 });
 
 it('applySorting attribute-pad zet requiresAttributeSorting op true en geen SQL orderBy', function () {
-    $t = new DummyHasSortingTable();
+    $t = new DummyHasSortingTable;
     $t->sortBy('full_name');
-    $query = (new HSUser())->newQuery();
+    $query = (new HSUser)->newQuery();
     $t->applySorting($query);
     expect($t->requiresAttributeSorting())->toBeTrue()
         ->and($query->toSql())->not->toContain('order by');
 });
 
 it('initializeSorting zet defaults en getSortIcon/isSorted werken', function () {
-    $t = new DummyHasSortingTable();
+    $t = new DummyHasSortingTable;
     $t->initializeSorting();
     expect($t->sortField)->toBe('id')->and($t->sortDirection)->toBe('asc');
 
