@@ -20,8 +20,10 @@
                 <td @class([
                     'px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300',
                     'text-' . $column->getAlign()->value
-                ]) wire:key="cell-{{ $column->getField() }}-{{ $row->getKey() }}">
-                    <div @class(['min-w-0 truncate' => $column->getWidth()])>
+                ]) wire:key="cell-{{ $column->getField() }}-{{ $row->getKey() }}"
+                    @if($column->getWidth()) style="width: {{ $column->getWidth() }}" @endif>
+                    <div @class(['min-w-0 truncate' => $column->getWidth()]) @if($column->getWidth())
+                    style="max-width: {{ $column->getWidth() }}" @endif>
                         {!! $this->renderCell($column, $row) !!}
                     </div>
                 </td>
