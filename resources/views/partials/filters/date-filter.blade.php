@@ -116,7 +116,7 @@
                     this.selectedTo = dateStr;
                 }
             }
-            $wire.set('filters.' + this.field, { from: this.selectedFrom || null, to: this.selectedTo || null });
+            // Do not update Livewire yet for range; wait until Apply is clicked
         } else {
             this.selectedSingle = dateStr;
             $wire.set('filters.' + this.field, this.selectedSingle);
@@ -260,8 +260,8 @@
                                    text-gray-700 dark:text-gray-100
                                    hover:bg-gray-100 dark:hover:bg-gray-700
                                   " :class="{
-                                '{{ $colors['background'] }} text-white': (!isRange && isSameDayStr(cell.iso, selectedSingle)),
-                                '{{ $colors['background'] }} text-white': (isRange && (isSameDayStr(cell.iso, selectedFrom) || isSameDayStr(cell.iso, selectedTo))),
+                                '{{ $colors['background'] }} text-gray-800 dark:text-white': (!isRange && isSameDayStr(cell.iso, selectedSingle)),
+                                '{{ $colors['background'] }} text-gray-800 dark:text-white': (isRange && (isSameDayStr(cell.iso, selectedFrom) || isSameDayStr(cell.iso, selectedTo))),
                                 '{{ $colors['background'] }} {{ $colors['text'] }}': (isRange && isBetween(cell.iso, selectedFrom, selectedTo) && !isSameDayStr(cell.iso, selectedFrom) && !isSameDayStr(cell.iso, selectedTo)),
                             }" x-text="cell.label" x-on:click="selectDate(cell.iso)"></button>
                     </template>
@@ -283,7 +283,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <button type="button" class="text-xs {{ $colors['text'] }} hover:underline"
-                        x-on:click="open=false">Apply</button>
+                        x-on:click="$wire.set('filters.' + field, { from: selectedFrom || null, to: selectedTo || null }); open=false">Apply</button>
                 </div>
             </div>
         </template>

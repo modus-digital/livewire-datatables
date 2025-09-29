@@ -322,19 +322,19 @@ abstract class Table extends Component
 
             // Handle date range filtering
             if (is_array($filterValue)) {
-                $matches = true;
-
+                $fromOk = true;
                 if (! empty($filterValue['from'])) {
                     $fromDate = \Carbon\Carbon::parse($filterValue['from'])->startOfDay();
-                    $matches = $matches && $attributeDate->greaterThanOrEqualTo($fromDate);
+                    $fromOk = $attributeDate->greaterThanOrEqualTo($fromDate);
                 }
 
+                $toOk = true;
                 if (! empty($filterValue['to'])) {
                     $toDate = \Carbon\Carbon::parse($filterValue['to'])->endOfDay();
-                    $matches = $matches && $attributeDate->lessThanOrEqualTo($toDate);
+                    $toOk = $attributeDate->lessThanOrEqualTo($toDate);
                 }
 
-                return $matches;
+                return $fromOk && $toOk;
             }
 
             // Handle single date filtering

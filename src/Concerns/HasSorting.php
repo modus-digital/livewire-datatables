@@ -82,7 +82,7 @@ trait HasSorting
         }
 
         // Check if we're dealing with a model attribute before proceeding with SQL sorting
-        if (method_exists($this, 'isFieldAttribute') && $this->isFieldAttribute($sortField)) {
+        if ($this->isFieldAttribute($sortField)) {
             // This field is a model attribute - flag for PHP-based sorting
             $this->requiresAttributeSorting = true;
 

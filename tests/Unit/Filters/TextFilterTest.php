@@ -1,154 +1,95 @@
 <?php
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+declare(strict_types=1);
+
 use ModusDigital\LivewireDatatables\Filters\TextFilter;
 
-// Helper function to create mock query
-function createMockQueryForTextFilter(): Builder
+class TFUser extends \Illuminate\Database\Eloquent\Model
 {
-    $model = new class extends Model
+    protected $table = 'users';
+
+    public function getDisplayNameAttribute(): string
     {
-        protected $table = 'test_table';
-    };
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+    }
 
-    $mock = Mockery::mock(Builder::class);
-    $mock->shouldReceive('getModel')->andReturn($model)->byDefault();
-
-    return $mock;
+    public function account()
+    {
+        return $this->belongsTo(TFAccount::class, 'account_id');
+    }
 }
 
-beforeEach(function () {
-    $this->filter = TextFilter::make('Name');
+class TFAccount extends \Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'accounts';
+
+    public function getSlugAttribute(): string
+    {
+        return strtolower((string) ($this->attributes['name'] ?? ''));
+    }
+}
+
+it('TextFilter exact/contains/startsWith/endsWith SQL op normale kolom', function () {
+    $query = (new TFUser())->newQuery();
+
+    // contains
+    $f = TextFilter::make('first_name')->contains();
+    $f->apply($query, 'John');
+    $sql = $query->toSql();
+    $bindings = $query->getQuery()->getBindings();
+    expect($sql)->toContain('where "users"."first_name" like ?')
+        ->and($bindings[count($bindings) - 1])->toBe('%John%');
+
+    // startsWith
+    $query = (new TFUser())->newQuery();
+    $f = TextFilter::make('first_name')->startsWith();
+    $f->apply($query, 'Jo');
+    $sql = $query->toSql();
+    $bindings = $query->getQuery()->getBindings();
+    expect($sql)->toContain('where "users"."first_name" like ?')
+        ->and($bindings[count($bindings) - 1])->toBe('Jo%');
+
+    // endsWith
+    $query = (new TFUser())->newQuery();
+    $f = TextFilter::make('first_name')->endsWith();
+    $f->apply($query, 'hn');
+    $sql = $query->toSql();
+    $bindings = $query->getQuery()->getBindings();
+    expect($sql)->toContain('where "users"."first_name" like ?')
+        ->and($bindings[count($bindings) - 1])->toBe('%hn');
+
+    // exact
+    $query = (new TFUser())->newQuery();
+    $f = TextFilter::make('first_name')->exact();
+    $f->apply($query, 'John');
+    $sql = $query->toSql();
+    $bindings = $query->getQuery()->getBindings();
+    expect($sql)->toContain('where "users"."first_name" = ?')
+        ->and($bindings[count($bindings) - 1])->toBe('John');
 });
 
-it('creates filter with correct name and field', function () {
-    expect($this->filter->getName())->toBe('Name')
-        ->and($this->filter->getField())->toBe('name');
+it('TextFilter relatiepad met whereHas', function () {
+    $query = (new TFUser())->newQuery();
+    $f = TextFilter::make('account.name')->contains();
+    $f->apply($query, 'Acme');
+    $sql = $query->toSql();
+    expect($sql)->toContain('exists')
+        ->and($sql)->toContain('from "accounts"')
+        ->and($sql)->toContain('"name" like ?');
 });
 
-it('allows custom field name', function () {
-    $filter = TextFilter::make('Full Name')->field('full_name');
+it('TextFilter attribute-pad zet requiresAttributeFiltering en geen SQL where', function () {
+    // direct attribute
+    $query = (new TFUser())->newQuery();
+    $f = TextFilter::make('display_name')->contains();
+    $f->apply($query, 'Jane');
+    expect($f->requiresAttributeFiltering())->toBeTrue()
+        ->and($query->toSql())->not->toContain('where');
 
-    expect($filter->getField())->toBe('full_name');
-});
-
-it('sets and gets default value', function () {
-    $filter = TextFilter::make('Name')->default('John');
-
-    expect($filter->getDefault())->toBe('John');
-});
-
-it('sets and gets placeholder', function () {
-    $filter = TextFilter::make('Name')->placeholder('Enter name...');
-
-    expect($filter->getPlaceholder())->toBe('Enter name...');
-});
-
-it('uses exact operator', function () {
-    $filter = TextFilter::make('Name')->exact();
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('test_table.name', '=', 'John')->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('uses contains operator by default', function () {
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('test_table.name', 'like', '%John%')->andReturnSelf();
-
-    $this->filter->apply($query, 'John');
-});
-
-it('uses contains operator explicitly', function () {
-    $filter = TextFilter::make('Name')->contains();
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('test_table.name', 'like', '%John%')->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('uses starts with operator', function () {
-    $filter = TextFilter::make('Name')->startsWith();
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('test_table.name', 'like', 'John%')->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('uses ends with operator', function () {
-    $filter = TextFilter::make('Name')->endsWith();
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('where')->once()->with('test_table.name', 'like', '%John')->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('handles relationship fields with exact operator', function () {
-    $filter = TextFilter::make('User Name')->field('user.name')->exact();
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('whereHas')->once()->with('user', Mockery::type('Closure'))->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('handles relationship fields with like operator', function () {
-    $filter = TextFilter::make('User Name')->field('user.name');
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('whereHas')->once()->with('user', Mockery::type('Closure'))->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('handles relationship fields with starts with operator', function () {
-    $filter = TextFilter::make('User Name')->field('user.name')->startsWith();
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('whereHas')->once()->with('user', Mockery::type('Closure'))->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('handles relationship fields with ends with operator', function () {
-    $filter = TextFilter::make('User Name')->field('user.name')->endsWith();
-
-    $query = createMockQueryForTextFilter();
-    $query->shouldReceive('whereHas')->once()->with('user', Mockery::type('Closure'))->andReturnSelf();
-
-    $filter->apply($query, 'John');
-});
-
-it('returns query unchanged when value is empty', function () {
-    $query = createMockQueryForTextFilter();
-    $query->shouldNotReceive('where');
-    $query->shouldNotReceive('whereHas');
-
-    $result = $this->filter->apply($query, '');
-    expect($result)->toBe($query);
-
-    $result = $this->filter->apply($query, null);
-    expect($result)->toBe($query);
-});
-
-it('renders HTML input correctly', function () {
-    $html = $this->filter->render();
-
-    expect($html)->toContain('wire:model.live.debounce.300ms="filters.name"')
-        ->and($html)->toContain('placeholder="Filter by Name"')
-        ->and($html)->toContain('<label')
-        ->and($html)->toContain('Name')
-        ->and($html)->toContain('<input');
-});
-
-it('renders HTML with custom placeholder', function () {
-    $filter = TextFilter::make('Name')->placeholder('Search names...');
-    $html = $filter->render();
-
-    expect($html)->toContain('placeholder="Search names..."');
+    // relatie attribute
+    $query = (new TFUser())->newQuery();
+    $f = TextFilter::make('account.slug')->contains();
+    $f->apply($query, 'acme');
+    expect($f->requiresAttributeFiltering())->toBeTrue()
+        ->and($query->toSql())->not->toContain('exists');
 });

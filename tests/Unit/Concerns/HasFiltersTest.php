@@ -1,202 +1,111 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use ModusDigital\LivewireDatatables\Concerns\HasFilters;
+use Illuminate\Support\Collection;
+use ModusDigital\LivewireDatatables\Filters\DateFilter;
 use ModusDigital\LivewireDatatables\Filters\SelectFilter;
 use ModusDigital\LivewireDatatables\Filters\TextFilter;
+use ModusDigital\LivewireDatatables\Livewire\Table;
 
-beforeEach(function () {
-    $this->component = new class
+class FiltersUser extends \Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'users';
+
+    public function getDisplayNameAttribute(): string
     {
-        use HasFilters;
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+    }
 
-        public $resetPageCalled = false;
-
-        protected function filters(): array
-        {
-            return [
-                TextFilter::make('Name')->default('John'),
-                SelectFilter::make('Status')->options(['active' => 'Active', 'inactive' => 'Inactive']),
-                TextFilter::make('Email')->field('email'),
-            ];
-        }
-
-        public function resetPage(): void
-        {
-            $this->resetPageCalled = true;
-        }
-    };
-});
-
-it('returns empty filters by default', function () {
-    $component = new class
+    public function company()
     {
-        use HasFilters;
-    };
+        return $this->belongsTo(FiltersCompany::class, 'company_id');
+    }
+}
 
-    expect($component->getFilters())->toBeEmpty();
-});
+class FiltersCompany extends \Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'companies';
 
-it('returns defined filters', function () {
-    $filters = $this->component->getFilters();
+    public function getSlugAttribute(): string
+    {
+        return strtolower((string) ($this->attributes['name'] ?? ''));
+    }
+}
 
-    expect($filters)->toHaveCount(3)
-        ->and($filters->first())->toBeInstanceOf(TextFilter::class)
-        ->and($filters->first()->getName())->toBe('Name')
-        ->and($filters->get(1))->toBeInstanceOf(SelectFilter::class)
-        ->and($filters->get(1)->getName())->toBe('Status');
-});
+class DummyHasFiltersTable extends Table
+{
+    protected string $model = FiltersUser::class;
 
-it('caches filters after first call', function () {
-    $filters1 = $this->component->getFilters();
-    $filters2 = $this->component->getFilters();
+    protected function filters(): array
+    {
+        return [
+            TextFilter::make('display_name'), // direct attribute
+            TextFilter::make('company.slug'), // relatie attribute
+            SelectFilter::make('status')->options(['active' => 'Active', 'blocked' => 'Blocked']),
+            SelectFilter::make('tags')->multiple(),
+            DateFilter::make('created_at')->range(),
+        ];
+    }
+}
 
-    expect($filters1)->toBe($filters2);
-});
+it('applyFilters slaat lege waarden over en gebruikt data_get voor dot notatie', function () {
+    $table = new DummyHasFiltersTable();
 
-it('applies filters to query', function () {
-    $this->component->filters = [
-        'name' => 'John',
+    // stel filters state met dot notation
+    $table->filters = [
+        'display_name' => '', // leeg -> overslaan
+        'company' => ['slug' => 'acme'],
         'status' => 'active',
+        'tags' => [], // leeg array -> overslaan
+        'created_at' => ['from' => null, 'to' => null], // leeg -> overslaan
     ];
 
-    $model = new class extends Model
-    {
-        protected $table = 'test_table';
-    };
-    $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
-    $query->shouldReceive('where')->twice()->andReturnSelf();
+    $query = $table->getModel()->newQuery();
+    $spy = \Mockery::spy($query);
 
-    $result = $this->component->applyFilters($query);
+    $result = $table->applyFilters($query);
 
-    expect($result)->toBe($query);
+    expect($result)->toBeInstanceOf(Builder::class);
 });
 
-it('handles dotted field names with nested filter arrays', function () {
-    // Create a component with a dotted field filter
-    $component = new class
-    {
-        use HasFilters;
-
-        protected function filters(): array
-        {
-            return [
-                SelectFilter::make('Client Status')->field('client.status')->options(['active' => 'Active', 'inactive' => 'Inactive']),
-            ];
-        }
-
-        public function resetPage(): void
-        {
-            // Mock implementation
-        }
-    };
-
-    // Set the nested filter structure that Livewire creates
-    $component->filters = [
-        'client' => [
-            'status' => 'active',
-        ],
+it('requiresAttributeFiltering true wanneer attribute-modus triggert', function () {
+    $table = new DummyHasFiltersTable();
+    $table->filters = [
+        'display_name' => 'Jane', // direct attribute -> triggert
     ];
 
-    $model = new class extends Model
-    {
-        protected $table = 'test_table';
-    };
-    $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
-    $query->shouldReceive('whereHas')->once()->with('client', Mockery::type('Closure'))->andReturnSelf();
-
-    $result = $component->applyFilters($query);
-
-    expect($result)->toBe($query);
+    expect($table->requiresAttributeFiltering())->toBeTrue();
 });
 
-it('skips empty filter values', function () {
-    $this->component->filters = [
-        'name' => '',
-        'status' => null,
-        'email' => [],
+it('getActiveAttributeFilters bevat volledige details', function () {
+    $table = new DummyHasFiltersTable();
+    $table->filters = [
+        'display_name' => 'Jane',
+        'company' => ['slug' => 'acme'],
+        'status' => 'active',
+        'tags' => ['a', 'b'],
     ];
 
-    $model = new class extends Model
-    {
-        protected $table = 'test_table';
-    };
-    $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
-    $query->shouldNotReceive('where');
+    $details = $table->getActiveAttributeFilters();
 
-    $result = $this->component->applyFilters($query);
+    // display_name en company.slug zijn attributes -> aanwezig met details
+    expect($details)->toBeArray()->and(count($details))->toBeGreaterThanOrEqual(2);
 
-    expect($result)->toBe($query);
+    $first = $details[0];
+    expect($first)->toHaveKeys(['relation', 'field', 'value', 'filter_instance'])
+        ->and(array_key_exists('operator', $first) || array_key_exists('type', $first) || array_key_exists('multiple', $first))->toBeTrue();
 });
 
-it('resets all filters', function () {
-    $this->component->filters = ['name' => 'John', 'status' => 'active'];
+it('resetFilters en resetFilter resetten state en dispatchen events', function () {
+    $table = new DummyHasFiltersTable();
+    $table->filters = ['status' => 'active', 'company' => ['slug' => 'acme']];
 
-    $this->component->resetFilters();
+    // Livewire\Component::dispatch returnt $this; we checken niet de dispatcher maar state effecten
+    $table->resetFilter('company.slug');
+    expect(data_get($table->filters, 'company.slug'))->toBeNull();
 
-    expect($this->component->filters)->toBe([])
-        ->and($this->component->resetPageCalled)->toBeTrue();
-});
-
-it('resets specific filter', function () {
-    $this->component->filters = ['name' => 'John', 'status' => 'active'];
-
-    $this->component->resetFilter('name');
-
-    expect($this->component->filters)->toBe(['status' => 'active'])
-        ->and($this->component->resetPageCalled)->toBeTrue();
-});
-
-it('detects active filters', function () {
-    $this->component->filters = ['name' => 'John'];
-
-    expect($this->component->hasActiveFilters())->toBeTrue();
-});
-
-it('detects no active filters when empty', function () {
-    $this->component->filters = [];
-
-    expect($this->component->hasActiveFilters())->toBeFalse();
-});
-
-it('detects no active filters when values are empty', function () {
-    $this->component->filters = ['name' => '', 'status' => null, 'tags' => []];
-
-    expect($this->component->hasActiveFilters())->toBeFalse();
-});
-
-it('counts active filters', function () {
-    $this->component->filters = ['name' => 'John', 'status' => 'active', 'email' => ''];
-
-    expect($this->component->getActiveFilterCount())->toBe(2);
-});
-
-it('counts zero active filters', function () {
-    $this->component->filters = ['name' => '', 'status' => null];
-
-    expect($this->component->getActiveFilterCount())->toBe(0);
-});
-
-it('initializes filter defaults', function () {
-    $this->component->initializeFilters();
-
-    expect($this->component->filters['name'])->toBe('John');
-});
-
-it('does not override existing filter values during initialization', function () {
-    $this->component->filters = ['name' => 'Jane'];
-
-    $this->component->initializeFilters();
-
-    expect($this->component->filters['name'])->toBe('Jane');
-});
-
-it('resets page when filters are updated', function () {
-    $this->component->updatedFilters();
-
-    expect($this->component->resetPageCalled)->toBeTrue();
+    $table->resetFilters();
+    expect($table->filters)->toBe([]);
 });

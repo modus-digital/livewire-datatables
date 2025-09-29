@@ -2,9 +2,6 @@
 @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
     <div class="relative z-[9999] flex justify-end">
         <details class="relative">
-            @php
-                $activeFilterCount = method_exists($this, 'getActiveFilterCount') ? $this->getActiveFilterCount() : 0;
-            @endphp
             <summary
                 class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm cursor-pointer select-none hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 mr-4 my-4"
                 style="list-style: none;">
@@ -15,10 +12,10 @@
                         clip-rule="evenodd" />
                 </svg>
                 <span>Filters</span>
-                @if($activeFilterCount > 0)
+                @if((method_exists($this, 'getActiveFilterCount') ? $this->getActiveFilterCount() : 0) > 0)
                     <span
-                        class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium {{ $colors['background'] }} text-white">
-                        {{ $activeFilterCount }}
+                        class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium {{ $colors['background'] }} text-gray-800 dark:text-white">
+                        {{ method_exists($this, 'getActiveFilterCount') ? $this->getActiveFilterCount() : 0 }}
                     </span>
                 @endif
             </summary>

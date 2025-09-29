@@ -1,13 +1,14 @@
 @use('ModusDigital\LivewireDatatables\Enums\Align')
 
 @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
+@php($baseColor = \ModusDigital\LivewireDatatables\Support\Color::get()->value)
 
 <thead class="bg-gray-50 dark:bg-gray-800 mx-4">
     <tr>
         @if ($this->hasSelection())
             <th scope="col" class="relative px-6 py-3 text-left">
-                <input type="checkbox" wire:model.live="selectAll" wire:click="toggleSelectAll"
-                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-xs focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                <input type="checkbox" @checked($this->selectAll) wire:click="toggleSelectAll"
+                    class="w-4 h-4 text-{{ $baseColor }}-600 bg-gray-100 border-gray-300 rounded {{ 'focus:ring-' . $baseColor . '-500' }} dark:{{ 'focus:ring-' . $baseColor . '-600' }} dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
             </th>
         @endif
 

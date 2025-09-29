@@ -58,7 +58,7 @@
                         </span>
                     @else
                         <button wire:click="previousPage"
-                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-1 focus:ring-indigo-500">
+                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 focus:outline-hidden focus:ring-1 {{ $colors['ring'] }}">
                             <span class="sr-only">Previous</span>
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
@@ -74,7 +74,7 @@
                     @if($rows->lastPage() <= $maxVisible)
                         {{-- Show all pages if total pages <= 6 --}} @for($page = 1; $page <= $rows->lastPage(); $page++)
                             @if($page == $rows->currentPage()) <span
-                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} dark:border-indigo-700">
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} {{ $colors['border'] }}">
                                 {{ $page }}
                                 </span>
                             @else
@@ -91,7 +91,7 @@
                                 @for($page = 1; $page <= 5; $page++)
                                     @if($page == $rows->currentPage())
                                         <span
-                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} dark:border-indigo-700">
+                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} {{ $colors['border'] }}">
                                             {{ $page }}
                                         </span>
                                     @else
@@ -132,7 +132,7 @@
                                 @for($page = $rows->lastPage() - 4; $page <= $rows->lastPage(); $page++)
                                     @if($page == $rows->currentPage())
                                         <span
-                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} dark:border-indigo-700">
+                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} {{ $colors['border'] }}">
                                             {{ $page }}
                                         </span>
                                     @else
@@ -161,7 +161,7 @@
                                 @for($page = $rows->currentPage() - 1; $page <= $rows->currentPage() + 1; $page++)
                                     @if($page == $rows->currentPage())
                                         <span
-                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} dark:border-indigo-700">
+                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium {{ $colors['background'] }} {{ $colors['text'] }} {{ $colors['border'] }}">
                                             {{ $page }}
                                         </span>
                                     @else

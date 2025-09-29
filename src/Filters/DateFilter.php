@@ -91,6 +91,9 @@ class DateFilter extends Filter
 
     /**
      * Apply filter to a direct model attribute.
+     *
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applyDirectAttributeFilter(Builder $query, string $attributeField, mixed $value): Builder
     {
@@ -113,6 +116,9 @@ class DateFilter extends Filter
 
     /**
      * Apply filter to a relationship field, handling model attributes.
+     *
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applyRelationshipFilter(Builder $query, mixed $value): Builder
     {
@@ -147,6 +153,9 @@ class DateFilter extends Filter
 
     /**
      * Apply filter to a model attribute in a relationship.
+     *
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function applyAttributeFilter(Builder $query, string $relation, string $attributeField, \Illuminate\Database\Eloquent\Model $relatedModel, mixed $value): Builder
     {

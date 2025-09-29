@@ -1,5 +1,6 @@
 <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
     @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
+    @php($baseColor = \ModusDigital\LivewireDatatables\Support\Color::get()->value)
     @forelse($rows as $row)
         <tr @class([
             'hover:bg-gray-50 dark:hover:bg-gray-700 py-4',
@@ -12,7 +13,7 @@
                 <td class="relative px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     <input type="checkbox" wire:click.stop="toggleSelection({{ $row->id }})"
                         @checked($this->isSelected($row->id))
-                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-xs focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded {{ 'focus:ring-' . $baseColor . '-500' }} dark:{{ 'focus:ring-' . $baseColor . '-600' }} dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                 </td>
             @endif
 

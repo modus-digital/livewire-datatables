@@ -7,6 +7,7 @@
 @endphp
 
 @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
+@php($baseColor = \ModusDigital\LivewireDatatables\Support\Color::get()->value)
 
 <div class="relative" x-data="{
     open: false,
@@ -121,7 +122,7 @@
         <div class="flex items-center gap-2">
             <template x-if="multiple && selectedCount() > 0">
                 <span
-                    class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium {{ $colors['background'] }} text-white"
+                    class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-medium {{ $colors['background'] }} text-gray-800 dark:text-white"
                     x-text="selectedCount()"></span>
             </template>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" viewBox="0 0 20 20"
@@ -137,7 +138,7 @@
         x-show="open" x-transition>
         <div class="p-2 border-b border-gray-100 dark:border-gray-700">
             <input type="text" x-model="query" placeholder="Zoeken..."
-                class="w-full rounded-md border-0 py-1.5 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm dark:ring-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+                class="w-full rounded-md border-0 py-1.5 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset {{ 'focus:ring-' . $baseColor . '-600' }} sm:text-sm dark:ring-gray-600 dark:bg-gray-700 dark:text-gray-200" />
         </div>
         <div class="max-h-60 overflow-auto py-1">
             @if (!$multiple)

@@ -1,5 +1,7 @@
 @props(['field', 'placeholder' => null, 'name', 'hideLabel' => false])
 
+@php($baseColor = \ModusDigital\LivewireDatatables\Support\Color::get()->value)
+
 <div class="relative">
     @unless ($hideLabel)
         <label class="block text-base font-medium leading-6 text-gray-900 dark:text-white mb-1">
@@ -7,5 +9,5 @@
         </label>
     @endunless
     <input type="text" wire:model.live.debounce.300ms="filters.{{ $field }}" placeholder="{{ $placeholder }}"
-        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6 dark:bg-gray-700 dark:text-white dark:ring-gray-600" />
+        class="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset {{ 'focus:ring-' . $baseColor . '-600' }} sm:text-base sm:leading-6 dark:bg-gray-700 dark:text-white dark:ring-gray-600" />
 </div>

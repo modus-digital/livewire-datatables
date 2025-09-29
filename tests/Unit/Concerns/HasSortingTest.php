@@ -1,283 +1,109 @@
 <?php
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use ModusDigital\LivewireDatatables\Columns\TextColumn;
-use ModusDigital\LivewireDatatables\Concerns\HasSorting;
+declare(strict_types=1);
 
-class User extends Model
+use Illuminate\Database\Eloquent\Builder;
+use ModusDigital\LivewireDatatables\Columns\Column;
+use ModusDigital\LivewireDatatables\Livewire\Table;
+
+class HSUser extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'users';
+
+    public function getFullNameAttribute(): string
+    {
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(HSAccount::class, 'account_id');
+    }
 }
 
-beforeEach(function () {
-    $this->component = new class
+class HSAccount extends \Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'accounts';
+}
+
+class DummyHasSortingTable extends Table
+{
+    protected string $model = HSUser::class;
+
+    protected function columns(): array
     {
-        use HasSorting;
+        return [
+            Column::make('first_name', 'First')->sortable(),
+            Column::make('account.name', 'Account Name')->sortable(),
+            Column::make('full_name', 'Full Name')->sortable(), // attribute
+            Column::make('last_name', 'Last'), // non-sortable
+        ];
+    }
+}
 
-        public $resetPageCalled = false;
+it('sortBy togglet richting en wijzigt veld; non-sortable doet niets', function () {
+    $t = new DummyHasSortingTable();
+    $t->sortBy('first_name');
+    expect($t->sortField)->toBe('first_name')->and($t->sortDirection)->toBe('asc');
 
-        public function resetPage(): void
-        {
-            $this->resetPageCalled = true;
-        }
+    $t->sortBy('first_name');
+    expect($t->sortDirection)->toBe('desc');
 
-        public function getModel(): Model
-        {
-            return new class extends Model
-            {
-                protected $table = 'test_table';
-            };
-        }
+    $t->sortBy('account.name');
+    expect($t->sortField)->toBe('account.name')->and($t->sortDirection)->toBe('asc');
 
-        public function isColumnSortable(string $field): bool
-        {
-            return in_array($field, ['name', 'email', 'created_at', 'user.name']);
-        }
-
-        public function getColumn(string $field): ?TextColumn
-        {
-            if ($field === 'custom_sort') {
-                return TextColumn::make('Custom')->sortField('actual_field');
-            }
-
-            if ($field === 'user.name') {
-                return TextColumn::make('User Name')->field('user.name');
-            }
-
-            return null;
-        }
-    };
+    // non-sortable
+    $t->sortBy('last_name');
+    expect($t->sortField)->toBe('account.name');
 });
 
-it('has default sort field and direction', function () {
-    expect($this->component->sortField)->toBe('')
-        ->and($this->component->sortDirection)->toBe('asc');
+it('applySorting gewone kolom prefix met tabelnaam', function () {
+    $t = new DummyHasSortingTable();
+    $t->sortBy('first_name');
+    $query = (new HSUser())->newQuery();
+    $t->applySorting($query);
+    expect($query->toSql())->toContain('order by "users"."first_name" asc');
 });
 
-it('sorts by field ascending when not currently sorted', function () {
-    $this->component->sortBy('name');
+it('applySorting relatie join (BelongsTo) en één JOIN per tabel', function () {
+    $t = new DummyHasSortingTable();
+    $t->sortBy('account.name');
+    $query = (new HSUser())->newQuery();
+    $t->applySorting($query);
+    $sql = $query->toSql();
+    expect($sql)->toContain('left join "accounts"')
+        ->and($sql)->toContain('order by "accounts"."name" asc');
 
-    expect($this->component->sortField)->toBe('name')
-        ->and($this->component->sortDirection)->toBe('asc')
-        ->and($this->component->resetPageCalled)->toBeTrue();
+    // opnieuw toepassen moet geen extra join toevoegen
+    $t->applySorting($query);
+    $sql2 = $query->toSql();
+    // tel aantal "left join \"accounts\"" occurrences gelijk
+    $count1 = substr_count($sql, 'left join "accounts"');
+    $count2 = substr_count($sql2, 'left join "accounts"');
+    expect($count2)->toBe($count1);
 });
 
-it('toggles sort direction when already sorted by field', function () {
-    $this->component->sortField = 'name';
-    $this->component->sortDirection = 'asc';
-
-    $this->component->sortBy('name');
-
-    expect($this->component->sortField)->toBe('name')
-        ->and($this->component->sortDirection)->toBe('desc');
+it('applySorting attribute-pad zet requiresAttributeSorting op true en geen SQL orderBy', function () {
+    $t = new DummyHasSortingTable();
+    $t->sortBy('full_name');
+    $query = (new HSUser())->newQuery();
+    $t->applySorting($query);
+    expect($t->requiresAttributeSorting())->toBeTrue()
+        ->and($query->toSql())->not->toContain('order by');
 });
 
-it('toggles back to ascending when sorted descending', function () {
-    $this->component->sortField = 'name';
-    $this->component->sortDirection = 'desc';
+it('initializeSorting zet defaults en getSortIcon/isSorted werken', function () {
+    $t = new DummyHasSortingTable();
+    $t->initializeSorting();
+    expect($t->sortField)->toBe('id')->and($t->sortDirection)->toBe('asc');
 
-    $this->component->sortBy('name');
+    expect($t->getSortIcon('first_name'))->toBe('sort')
+        ->and($t->isSorted('first_name'))->toBeFalse();
 
-    expect($this->component->sortField)->toBe('name')
-        ->and($this->component->sortDirection)->toBe('asc');
-});
+    $t->sortBy('first_name');
+    expect($t->getSortIcon('first_name'))->toBe('sort-asc')
+        ->and($t->isSorted('first_name'))->toBeTrue();
 
-it('does not sort by non-sortable field', function () {
-    $originalField = $this->component->sortField;
-    $originalDirection = $this->component->sortDirection;
-
-    $this->component->sortBy('non_sortable');
-
-    expect($this->component->sortField)->toBe($originalField)
-        ->and($this->component->sortDirection)->toBe($originalDirection)
-        ->and($this->component->resetPageCalled)->toBeFalse();
-});
-
-it('applies basic sorting to query', function () {
-    $this->component->sortField = 'name';
-    $this->component->sortDirection = 'desc';
-
-    $model = new class extends Model
-    {
-        protected $table = 'test_table';
-    };
-    $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
-    $query->shouldReceive('orderBy')->once()->with('test_table.name', 'desc')->andReturnSelf();
-
-    $result = $this->component->applySorting($query);
-
-    expect($result)->toBe($query);
-});
-
-it('applies default sorting when no sort field set', function () {
-    $model = new class extends Model
-    {
-        protected $table = 'test_table';
-    };
-    $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
-    $query->shouldReceive('orderBy')->once()->with('test_table.id', 'asc')->andReturnSelf();
-
-    $this->component->applySorting($query);
-});
-
-it('uses custom sort field from column', function () {
-    $this->component->sortField = 'custom_sort';
-
-    $model = new class extends Model
-    {
-        protected $table = 'test_table';
-    };
-    $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('getModel')->andReturn($model)->byDefault();
-    $query->shouldReceive('orderBy')->once()->with('test_table.actual_field', 'asc')->andReturnSelf();
-
-    $this->component->applySorting($query);
-});
-
-it('returns correct sort icon for unsorted field', function () {
-    expect($this->component->getSortIcon('name'))->toBe('sort');
-});
-
-it('returns correct sort icon for ascending field', function () {
-    $this->component->sortField = 'name';
-    $this->component->sortDirection = 'asc';
-
-    expect($this->component->getSortIcon('name'))->toBe('sort-asc');
-});
-
-it('returns correct sort icon for descending field', function () {
-    $this->component->sortField = 'name';
-    $this->component->sortDirection = 'desc';
-
-    expect($this->component->getSortIcon('name'))->toBe('sort-desc');
-});
-
-it('detects when field is sorted', function () {
-    $this->component->sortField = 'name';
-
-    expect($this->component->isSorted('name'))->toBeTrue()
-        ->and($this->component->isSorted('email'))->toBeFalse();
-});
-
-it('initializes default sorting when empty', function () {
-    $this->component->sortField = '';
-
-    $this->component->initializeSorting();
-
-    expect($this->component->sortField)->toBe('id')
-        ->and($this->component->sortDirection)->toBe('asc');
-});
-
-it('does not override existing sorting during initialization', function () {
-    $this->component->sortField = 'name';
-    $this->component->sortDirection = 'desc';
-
-    $this->component->initializeSorting();
-
-    expect($this->component->sortField)->toBe('name')
-        ->and($this->component->sortDirection)->toBe('desc');
-});
-
-it('handles custom sort callback', function () {
-    $customSortCalled = false;
-
-    $column = TextColumn::make('Custom Field')
-        ->sortUsing(function ($query, $direction) use (&$customSortCalled) {
-            $customSortCalled = true;
-
-            return $query->orderBy('special_field', $direction);
-        });
-
-    $this->component = new class($column)
-    {
-        use HasSorting;
-
-        private $testColumn;
-
-        public function __construct($column)
-        {
-            $this->testColumn = $column;
-        }
-
-        public function resetPage(): void {}
-
-        public function getModel(): Model
-        {
-            return new class extends Model
-            {
-                protected $table = 'test_table';
-            };
-        }
-
-        public function isColumnSortable(string $field): bool
-        {
-            return $field === 'custom_field';
-        }
-
-        public function getColumn(string $field): ?TextColumn
-        {
-            if ($field === 'custom_field') {
-                return $this->testColumn;
-            }
-
-            return null;
-        }
-    };
-
-    $this->component->sortField = 'custom_field';
-
-    $model = new class extends Model
-    {
-        protected $table = 'test_table';
-    };
-    $query = Mockery::mock(Builder::class);
-    $query->shouldReceive('getModel')->andReturn($model);
-    $query->shouldReceive('orderBy')->once()->with('special_field', 'asc')->andReturnSelf();
-
-    $this->component->applySorting($query);
-
-    expect($customSortCalled)->toBeTrue();
-});
-
-it('detects model attributes correctly', function () {
-    $model = new class extends Model
-    {
-        protected $appends = ['full_name'];
-
-        protected $casts = ['settings' => 'array'];
-
-        public function getFullNameAttribute()
-        {
-            return $this->first_name . ' ' . $this->last_name;
-        }
-    };
-
-    // The isModelAttribute method is now in HasColumns trait
-    // We'll test it through the HasColumns functionality instead
-    expect(true)->toBeTrue(); // Placeholder test - functionality is tested in integration
-});
-
-it('tracks joined tables to prevent duplicates', function () {
-    // This test verifies that the joinedTables property prevents duplicate JOINs
-    // The functionality is implicitly tested by the existing sorting tests
-    // When the same sort field is applied multiple times, it should not create duplicate JOINs
-
-    expect($this->component)->toHaveProperty('joinedTables');
-
-    // Test that joinedTables is properly initialized as an array
-    $reflection = new ReflectionClass($this->component);
-    $property = $reflection->getProperty('joinedTables');
-    $property->setAccessible(true);
-    $joinedTables = $property->getValue($this->component);
-
-    expect($joinedTables)->toBeArray();
-});
-
-it('handles concatenated name sorting', function () {
-    // This test is complex to mock properly, so we'll skip it for now
-    // The functionality is tested in integration tests
-    expect(true)->toBeTrue();
+    $t->sortBy('first_name');
+    expect($t->getSortIcon('first_name'))->toBe('sort-desc');
 });

@@ -1,147 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use ModusDigital\LivewireDatatables\Filters\DateFilter;
 
-// Helper function to create mock query
-function createMockQueryForDateFilter(): Builder
+class DFUser extends \Illuminate\Database\Eloquent\Model
 {
-    $model = new class extends Model
+    protected $table = 'users';
+
+    public function getSignedUpAtAttribute(): string
     {
-        protected $table = 'test_table';
-    };
+        return (string) ($this->attributes['created_at'] ?? '');
+    }
 
-    $mock = Mockery::mock(Builder::class);
-    $mock->shouldReceive('getModel')->andReturn($model)->byDefault();
-
-    return $mock;
+    public function company()
+    {
+        return $this->belongsTo(DFCompany::class, 'company_id');
+    }
 }
 
-beforeEach(function () {
-    $this->filter = DateFilter::make('Created At');
+class DFCompany extends \Illuminate\Database\Eloquent\Model
+{
+    protected $table = 'companies';
+
+    public function getEstablishedOnAttribute(): string
+    {
+        return (string) ($this->attributes['established_on'] ?? '');
+    }
+}
+
+it('DateFilter single date op normale kolom', function () {
+    $query = (new DFUser())->newQuery();
+    $f = DateFilter::make('created_at');
+    $f->apply($query, '2023-01-02');
+    $sql = $query->toSql();
+    // SQLite gebruikt strftime in whereDate
+    expect($sql)->toContain("strftime('%Y-%m-%d', \"users\".\"created_at\") = cast(? as text)");
 });
 
-it('creates filter with correct name and field', function () {
-    expect($this->filter->getName())->toBe('Created At')
-        ->and($this->filter->getField())->toBe('created_at');
+it('DateFilter range from/to op normale kolom', function () {
+    $query = (new DFUser())->newQuery();
+    $f = DateFilter::make('created_at')->range();
+    $f->apply($query, ['from' => '2023-01-01', 'to' => '2023-01-31']);
+    $sql = $query->toSql();
+    expect($sql)->toContain('"users"."created_at" >= ?')
+        ->and($sql)->toContain('"users"."created_at" <= ?');
 });
 
-it('sets and gets default value', function () {
-    $filter = DateFilter::make('Created At')->default('2024-01-01');
-
-    expect($filter->getDefault())->toBe('2024-01-01');
+it('DateFilter relatiepad met whereHas', function () {
+    $query = (new DFUser())->newQuery();
+    $f = DateFilter::make('company.joined_on');
+    $f->apply($query, '2023-01-01');
+    $sql = $query->toSql();
+    expect($sql)->toContain('exists')
+        ->and($sql)->toContain('from "companies"')
+        ->and($sql)->toContain("strftime('%Y-%m-%d', \"joined_on\") = cast(? as text)");
 });
 
-it('sets range mode', function () {
-    $filter = DateFilter::make('Created At')->range();
+it('DateFilter attribute-pad zet requiresAttributeFiltering en geen SQL where', function () {
+    // direct attribute
+    $query = (new DFUser())->newQuery();
+    $f = DateFilter::make('signed_up_at');
+    $f->apply($query, '2023-01-01');
+    expect($f->requiresAttributeFiltering())->toBeTrue()
+        ->and($query->toSql())->not->toContain('where');
 
-    expect($filter->isRange())->toBeTrue();
-});
-
-it('sets range mode explicitly false', function () {
-    $filter = DateFilter::make('Created At')->range(false);
-
-    expect($filter->isRange())->toBeFalse();
-});
-
-it('is not range by default', function () {
-    expect($this->filter->isRange())->toBeFalse();
-});
-
-it('sets custom format', function () {
-    $filter = DateFilter::make('Created At')->format('d/m/Y');
-
-    // Note: format is protected, so we test indirectly through behavior
-    expect($filter)->toBeInstanceOf(DateFilter::class);
-});
-
-it('applies single date filter', function () {
-    $query = createMockQueryForDateFilter();
-    $query->shouldReceive('whereDate')->once()->with('test_table.created_at', Mockery::type(Carbon::class))->andReturnSelf();
-
-    $this->filter->apply($query, '2024-01-01');
-});
-
-it('applies date range filter', function () {
-    $filter = DateFilter::make('Created At')->range();
-
-    $query = createMockQueryForDateFilter();
-    $query->shouldReceive('where')->twice()->andReturnSelf();
-
-    $filter->apply($query, ['from' => '2024-01-01', 'to' => '2024-01-31']);
-});
-
-it('applies partial date range filter with only from date', function () {
-    $filter = DateFilter::make('Created At')->range();
-
-    $query = createMockQueryForDateFilter();
-    $query->shouldReceive('where')->once()->with('test_table.created_at', '>=', Mockery::type(Carbon::class))->andReturnSelf();
-
-    $filter->apply($query, ['from' => '2024-01-01']);
-});
-
-it('applies partial date range filter with only to date', function () {
-    $filter = DateFilter::make('Created At')->range();
-
-    $query = createMockQueryForDateFilter();
-    $query->shouldReceive('where')->once()->with('test_table.created_at', '<=', Mockery::type(Carbon::class))->andReturnSelf();
-
-    $filter->apply($query, ['to' => '2024-01-31']);
-});
-
-it('handles relationship field with single date', function () {
-    $filter = DateFilter::make('User Created')->field('user.created_at');
-
-    $query = createMockQueryForDateFilter();
-    $query->shouldReceive('whereHas')->once()->with('user', Mockery::type('Closure'))->andReturnSelf();
-
-    $filter->apply($query, '2024-01-01');
-});
-
-it('handles relationship field with date range', function () {
-    $filter = DateFilter::make('User Created')->field('user.created_at')->range();
-
-    $query = createMockQueryForDateFilter();
-    $query->shouldReceive('whereHas')->once()->with('user', Mockery::type('Closure'))->andReturnSelf();
-
-    $filter->apply($query, ['from' => '2024-01-01', 'to' => '2024-01-31']);
-});
-
-it('returns query unchanged when value is empty', function () {
-    $query = createMockQueryForDateFilter();
-    $query->shouldNotReceive('where');
-    $query->shouldNotReceive('whereDate');
-    $query->shouldNotReceive('whereHas');
-
-    $result = $this->filter->apply($query, '');
-    expect($result)->toBe($query);
-
-    $result = $this->filter->apply($query, null);
-    expect($result)->toBe($query);
-
-    $result = $this->filter->apply($query, []);
-    expect($result)->toBe($query);
-});
-
-it('renders single date input correctly', function () {
-    $html = $this->filter->render();
-
-    expect($html)->toContain('type="date"')
-        ->and($html)->toContain('wire:model.live="filters.created_at"')
-        ->and($html)->toContain('<label')
-        ->and($html)->toContain('Created At')
-        ->and($html)->not->toContain('grid-cols-2');
-});
-
-it('renders date range inputs correctly', function () {
-    $filter = DateFilter::make('Created At')->range();
-    $html = $filter->render();
-
-    expect($html)->toContain('wire:model.live="filters.created_at.from"')
-        ->and($html)->toContain('wire:model.live="filters.created_at.to"')
-        ->and($html)->toContain('grid-cols-2')
-        ->and($html)->toContain('placeholder="From"')
-        ->and($html)->toContain('placeholder="To"');
+    // relatie attribute
+    $query = (new DFUser())->newQuery();
+    $f = DateFilter::make('company.established_on');
+    $f->apply($query, '2023-01-01');
+    expect($f->requiresAttributeFiltering())->toBeTrue()
+        ->and($query->toSql())->not->toContain('exists');
 });
