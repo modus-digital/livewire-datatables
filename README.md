@@ -1,39 +1,49 @@
 # Livewire Datatables
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/modus-digital/livewire-datatables.svg?style=flat-square)](https://packagist.org/packages/modus-digital/livewire-datatables)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/modus-digital/livewire-datatables/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/modus-digital/livewire-datatables/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/modus-digital/livewire-datatables/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/modus-digital/livewire-datatables/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/modus-digital/livewire-datatables.svg?style=flat-square)](https://packagist.org/packages/modus-digital/livewire-datatables)
+<!-- Art -->
+<img src="./art/banner.png">
+
+<p align="center">
+    <a href="https://packagist.org/packages/modus-digital/livewire-datatables">
+        <img src="https://img.shields.io/packagist/v/modus-digital/livewire-datatables.svg?style=flat-square" alt="Latest Version on Packagist">
+    </a>
+    <a href="https://github.com/modus-digital/livewire-datatables/actions?query=workflow%3Arun-tests+branch%3Amain">
+        <img src="https://img.shields.io/github/actions/workflow/status/modus-digital/livewire-datatables/run-tests.yml?branch=main&label=tests&style=flat-square" alt="GitHub Tests Action Status">
+    </a>
+    <a href="https://github.com/modus-digital/livewire-datatables/actions?query=workflow%3A%22Fix+PHP+code+style+issues%22+branch%3Amain">
+        <img src="https://img.shields.io/github/actions/workflow/status/modus-digital/livewire-datatables/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square" alt="GitHub Code Style Action Status">
+    </a>
+    <a href="https://packagist.org/packages/modus-digital/livewire-datatables">
+        <img src="https://img.shields.io/packagist/dt/modus-digital/livewire-datatables.svg?style=flat-square" alt="Total Downloads">
+    </a>
+</p>
 
 A modern, feature-rich **Livewire Datatable** component for the TALL stack (Tailwind CSS, Alpine.js, Laravel, Livewire). Built with modularity, performance, and developer experience in mind.
 
 ## ✨ Features
 
-- 🎨 **Beautiful Tailwind CSS styling** with dark mode support
-- 🔍 **Global search** with debounced input and relationship support
-- 🗂️ **Advanced filtering** with multiple filter types (Text, Select, Date)
-- 📊 **Column sorting** with visual indicators and custom sort fields
-- 📄 **Pagination** with customizable page sizes and navigation
-- ✅ **Row selection** with bulk actions and "select all" functionality
-- 🎯 **Row actions** with customizable buttons and callbacks
-- 🔧 **Highly customizable** with trait-based architecture
-- 🖼️ **Multiple column types** (Text, Icon, Image) with specialized features
-- 🏷️ **Badge support** with dynamic colors and callbacks
-- 🔗 **Clickable rows** with custom handlers
-- 🔭 **Custom cell views** for complex content rendering
-- 📱 **Responsive design** for all screen sizes
-- ♿ **Accessibility features** built-in
-- 🚀 **Performance optimized** with efficient querying
+-   🎨 **Beautiful Tailwind CSS styling** with dark mode support
+-   🔍 **Global search** with debounced input and relationship support
+-   🗂️ **Advanced filtering** with multiple filter types (Text, Select, Date)
+-   📊 **Column sorting** with visual indicators and custom sort fields
+-   📄 **Pagination** with customizable page sizes and navigation
+-   ✅ **Row selection** with bulk actions and "select all" functionality
+-   🎯 **Row actions** with customizable buttons and callbacks
+-   🖼️ **Multiple column types** (Text, Icon, Image) with specialized features
+-   🏷️ **Badge support** with dynamic colors and callbacks
+-   🔗 **Clickable rows** with custom handlers
+-   🔭 **Custom cell views** for complex content rendering
+-   🚀 **Performance optimized** with efficient querying
 
 ## 📋 Requirements
 
-| Requirement | Version |
-|-------------|---------|
-| **PHP** | `^8.3` |
-| **Laravel** | `^11.0` or `^12.0` |
-| **Livewire** | `^3.0` |
-| **Tailwind CSS** | `^4.0` |
-| **Alpine.js** | `^3.0` |
+| Requirement      | Version            |
+| ---------------- | ------------------ |
+| **PHP**          | `^8.3`             |
+| **Laravel**      | `^11.0` or `^12.0` |
+| **Livewire**     | `^3.0`             |
+| **Tailwind CSS** | `^4.0`             |
+| **Alpine.js**    | `^3.0`             |
 
 ## 📦 Installation
 
@@ -54,6 +64,25 @@ php artisan vendor:publish --tag="livewire-datatables-views"
 ```
 
 This publishes all Blade templates to `resources/views/vendor/livewire-datatables/`.
+
+### Publishing Config (Optional)
+
+To customize the package, you can publish the config file:
+
+```bash
+php artisan vendor:publish --tag="livewire-datatables-config"
+```
+
+This publishes a config file to `config/livewire-datatables.php`
+
+### Source frontend styles
+
+To automatically source the frontend using tailwind, include the following files to the `app.css`
+
+```css
+@source '../../vendor/modus-digital/livewire-datatables/resources/**/*.blade.php';
+@source '../../vendor/modus-digital/livewire-datatables/src/**/*.php';
+```
 
 ## 🚀 Quick Start
 
@@ -87,12 +116,12 @@ class UsersTable extends Table
     protected function columns(): array
     {
         return [
-            Column::make('Name')
+            TextColumn::make('Name')
                 ->field('name')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Email')
+            TextColumn::make('Email')
                 ->field('email')
                 ->sortable()
                 ->searchable(),
@@ -102,7 +131,7 @@ class UsersTable extends Table
                 ->badge()
                 ->sortable(),
 
-            Column::make('Created')
+            TextColumn::make('Created')
                 ->field('created_at')
                 ->sortable()
                 ->format(fn($value) => $value->diffForHumans()),
@@ -112,11 +141,13 @@ class UsersTable extends Table
     protected function filters(): array
     {
         return [
-            SelectFilter::make('Status')->options([
-                'active' => 'Active',
-                'inactive' => 'Inactive',
-                'banned' => 'Banned',
-            ]),
+            SelectFilter::make('Status')
+                ->options([
+                    'active' => 'Active',
+                    'inactive' => 'Inactive',
+                    'banned' => 'Banned',
+                ])
+                ->multiple(),   // <-- This is optional
         ];
     }
 }
@@ -125,9 +156,7 @@ class UsersTable extends Table
 ### 2. Use in Your Blade Template
 
 ```blade
-<div>
-    <livewire:users-table />
-</div>
+<livewire:users-table />
 ```
 
 ## 📚 Documentation
@@ -136,79 +165,85 @@ class UsersTable extends Table
 
 #### Base Column
 
-The foundation for all column types with essential features:
+De basis met alle kernopties:
 
 ```php
 Column::make('Name')
-    ->field('name')                    // Database field
-    ->sortable()                       // Enable sorting
-    ->searchable()                     // Include in global search
-    ->hidden()                         // Hide column
-    ->width('w-32')                    // Set width classes
-    ->align('center')                  // Alignment: left, center, right
-    ->view('custom.cell')              // Custom view
-    ->relationship('profile.role')     // Access relationship data
-    ->sortField('custom_sort_field')   // Custom sort field
-    ->format(fn($value, $record) => strtoupper($value)); // Format callback
+    ->field('name')                    // Database field (ook: 'relation.field')
+    ->sortable()                       // Kolom sorteerbaar maken
+    ->searchable()                     // Opnemen in globale zoek
+    ->hidden()                         // Verbergen
+    ->width('150px')                   // CSS breedte (bv. '150px', '20%')
+    ->align('center')                  // 'left' | 'center' | 'right'
+    ->view('custom.cell')              // Custom Blade view voor de cel
+    ->sortField('users.name')          // Aparte sorteer-field (optioneel)
+    ->format(fn ($value, $record) => strtoupper((string) $value));
 ```
 
 #### TextColumn
 
-Specialized for text content with additional features:
+Extra’s voor tekstweergave:
 
 ```php
 TextColumn::make('Description')
     ->field('description')
-    ->limit(50)                        // Truncate text
-    ->badge()                          // Render as badge
-    ->badge('blue')                    // Badge with specific color
-    ->badge(fn($record) => $record->priority_color) // Dynamic badge color
-    ->fullWidth();                     // Badge spans full cell width
+    ->limit(50)                        // Tekst afkappen
+    ->badge('blue')                    // Badge tonen (kleur vast of via Closure)
+    ->fullWidth();                     // Badge over volle breedte
 ```
 
 #### IconColumn
 
-Display icons with optional counts:
-
 ```php
 IconColumn::make('Status')
     ->field('is_active')
-    ->icon(fn($record) => $record->is_active ? 'fa-check' : 'fa-times')
-    ->icon('<svg>...</svg>')           // Static SVG icon
-    ->count(fn($record) => $record->notifications_count); // Show count badge
+    ->icon(fn ($record) => $record->is_active ? 'fa-check' : 'fa-times')
+    ->count(fn ($record) => $record->notifications_count);
 ```
 
 #### ImageColumn
 
-Display images with fallback support:
-
 ```php
 ImageColumn::make('Avatar')
     ->field('avatar_url')
-    ->src(fn($record) => $record->getAvatarUrl()) // Dynamic source
-    ->fallback('/images/default-avatar.png')      // Fallback image
-    ->rounded()                                   // Apply rounded styling
-    ->size('w-10 h-10');                         // Size classes
+    ->src(fn ($record) => $record->getAvatarUrl())
+    ->circle();                        // Rond i.p.v. vierkant
+```
+
+Relatievelden gebruik je met dot-notatie in `field`:
+
+```php
+Column::make('Department')
+    ->field('department.name')         // Relationele kolom
+    ->sortable();
+```
+
+Voor aangepaste SQL sortering via een andere kolom:
+
+```php
+Column::make('Department')
+    ->field('department.name')
+    ->sortField('departments.name');
 ```
 
 ### Filters
 
 #### TextFilter
 
-Search within specific fields:
-
 ```php
+use ModusDigital\LivewireDatatables\Filters\TextFilter;
+
 TextFilter::make('Name')
     ->field('name')
     ->placeholder('Search names...')
-    ->operator('like');                // Operators: like, =, !=, >, <, >=, <=
+    ->contains();        // ook: ->exact(), ->startsWith(), ->endsWith()
 ```
 
 #### SelectFilter
 
-Dropdown selection with predefined options:
-
 ```php
+use ModusDigital\LivewireDatatables\Filters\SelectFilter;
+
 SelectFilter::make('Status')
     ->field('status')
     ->options([
@@ -217,62 +252,39 @@ SelectFilter::make('Status')
         'banned' => 'Banned Users',
     ])
     ->placeholder('All Statuses')
-    ->multiple();                      // Allow multiple selections
+    ->multiple();
 ```
 
 #### DateFilter
 
-Date range filtering:
-
 ```php
+use ModusDigital\LivewireDatatables\Filters\DateFilter;
+
 DateFilter::make('Created')
     ->field('created_at')
-    ->placeholder('Select date range...')
-    ->format('Y-m-d');                 // Date format
+    ->range()            // datumbereik (from/to)
+    ->format('Y-m-d');
 ```
 
-### Row Selection & Bulk Actions
+Filters werken ook op relatievelden (`field('relation.attribute')`). Indien een veld een Eloquent attribute/accessor is, valt filtering terug op PHP (na ophalen) voor correcte resultaten.
 
-Enable row selection and define bulk actions:
+### Row selection
+
+Rijselectie inschakelen en gebruiken:
 
 ```php
 class UsersTable extends Table
 {
-    public bool $showSelection = true; // Enable row selection
-
-    protected function bulkActions(): array
-    {
-        return [
-            [
-                'name' => 'Delete Selected',
-                'key' => 'delete',
-                'class' => 'bg-red-600 hover:bg-red-700 text-white',
-            ],
-            [
-                'name' => 'Export Selected',
-                'key' => 'export',
-                'class' => 'bg-green-600 hover:bg-green-700 text-white',
-            ],
-        ];
-    }
-
-    public function bulkActionDelete($rows)
-    {
-        $rows->each->delete();
-        session()->flash('message', 'Selected users deleted successfully.');
-    }
-
-    public function bulkActionExport($rows)
-    {
-        // Export logic here
-        return response()->download($this->generateExport($rows));
-    }
+    // Of via config('livewire-datatables.checkboxes')
+    public bool $showSelection = true;
 }
 ```
 
+Geselecteerde IDs vind je in `$this->selected` (array). Combineer dit met een globale actie om bulk-operaties te doen (zie hieronder).
+
 ### Row Actions
 
-Add action buttons to each row:
+Voeg rijacties met callbacks toe:
 
 ```php
 use ModusDigital\LivewireDatatables\Actions\RowAction;
@@ -281,30 +293,24 @@ protected function rowActions(): array
 {
     return [
         RowAction::make('edit', 'Edit')
-            ->icon('<svg>...</svg>')
-            ->class('text-blue-600 hover:text-blue-900'),
+            ->class('text-blue-600')
+            ->callback(fn ($row, $table) => redirect()->route('users.edit', $row)),
 
         RowAction::make('delete', 'Delete')
-            ->icon('<svg>...</svg>')
-            ->class('text-red-600 hover:text-red-900'),
+            ->confirm('Delete this user?')
+            ->callback(function ($row) {
+                $row->delete();
+                session()->flash('message', 'User deleted successfully.');
+            }),
     ];
-}
-
-public function rowActionEdit($row)
-{
-    return redirect()->route('users.edit', $row);
-}
-
-public function rowActionDelete($row)
-{
-    $row->delete();
-    session()->flash('message', 'User deleted successfully.');
 }
 ```
 
+Je kunt zichtbaarheid conditioneel maken met `->visible(fn ($row) => ...)` en een `->icon()` string meegeven.
+
 ### Global Actions
 
-Add header-level actions:
+Header-acties met callback (handig voor bulk op `$this->selected`):
 
 ```php
 use ModusDigital\LivewireDatatables\Actions\Action;
@@ -314,102 +320,77 @@ protected function actions(): array
     return [
         Action::make('create', 'Add User')
             ->class('bg-blue-600 hover:bg-blue-700 text-white')
-            ->label('+ Add User'),
-    ];
-}
+            ->callback(fn ($table) => redirect()->route('users.create')),
 
-public function globalAction($action)
-{
-    if ($action === 'create') {
-        return redirect()->route('users.create');
-    }
+        Action::make('delete-selected', 'Delete Selected')
+            ->class('bg-red-600 hover:bg-red-700 text-white')
+            ->confirm('Delete all selected users?')
+            ->callback(function ($table) {
+                $ids = $table->selected;
+                if (! empty($ids)) {
+                    \App\Models\User::whereIn('id', $ids)->delete();
+                    $table->deselectAll();
+                }
+            }),
+    ];
 }
 ```
 
 ### Clickable Rows
 
-Make entire rows clickable:
+Maak hele rijen klikbaar door `showRecord` te overriden:
 
 ```php
-class UsersTable extends Table
+public function showRecord(string|int $id): void
 {
-    public function showRecord(string|int $id): void
-    {
-        // Redirect to detail page
-        return redirect()->route('users.show', $id);
-
-        // Or dispatch Livewire event
-        // $this->dispatch('openUserDrawer', id: $id);
-    }
+    // Bijvoorbeeld:
+    redirect()->route('users.show', $id);
 }
 ```
 
 ### Pagination Configuration
 
-Customize pagination behavior:
-
 ```php
 class UsersTable extends Table
 {
-    public int $perPage = 25;                    // Default page size
-    public array $perPageOptions = [10, 25, 50, 100]; // Available options
-    public bool $showPerPageSelector = true;     // Show page size selector
+    public int $perPage = 25;                    // Standaard page size
+    protected array $perPageOptions = [10, 25, 50, 100];
 }
 ```
 
 ### Search Configuration
 
-Customize search behavior:
-
 ```php
 class UsersTable extends Table
 {
-    protected bool $searchable = true;           // Enable global search
-    protected string $searchPlaceholder = 'Search users...'; // Custom placeholder
+    protected bool $searchable = true;
+    protected string $searchPlaceholder = 'Search users...';
 }
 ```
 
 ### Empty State Customization
 
-Customize the empty state message:
+Publiceer de views en pas `resources/views/vendor/livewire-datatables/partials/empty-state.blade.php` aan:
 
-```php
-class UsersTable extends Table
-{
-    public string $emptyStateTitle = 'No users found';
-    public string $emptyStateDescription = 'Get started by creating your first user.';
-}
+```blade
+<h3 class="mt-2 text-sm font-medium">No records</h3>
+<p class="mt-1 text-sm">Try adjusting your filters.</p>
 ```
 
 ### Custom Query Building
-
-Override the base query for complex scenarios:
 
 ```php
 protected function query(): Builder
 {
     return $this->getModel()
         ->query()
-        ->with(['profile', 'roles'])
-        ->where('tenant_id', auth()->user()->tenant_id);
+        ->with(['profile', 'roles']);
 }
 ```
 
 ### Relationship Handling
 
-Access relationship data in columns:
-
-```php
-Column::make('Role')
-    ->relationship('profile.role')     // Nested relationship
-    ->searchable()                     // Will search in relationship
-    ->sortable(),                      // Will sort by relationship field
-
-Column::make('Department')
-    ->field('department_id')
-    ->relationship('department.name')
-    ->sortField('departments.name'),   // Custom sort field for relationship
-```
+Gebruik dot‑notatie in `field('relation.column')`. Voor sorting over relaties gebruik je `->sortField('related_table.column')`. Wanneer je sorteert op een attribute/accessor, wordt automatisch in PHP gesorteerd na ophalen.
 
 ## 🎨 Styling & Customization
 
@@ -447,14 +428,14 @@ Column::make('Actions')
 
 Available badge colors for TextColumn:
 
-- `gray` (default)
-- `red`
-- `yellow`
-- `green`
-- `blue`
-- `indigo`
-- `purple`
-- `pink`
+-   `gray` (default)
+-   `red`
+-   `yellow`
+-   `green`
+-   `blue`
+-   `indigo`
+-   `purple`
+-   `pink`
 
 ```php
 TextColumn::make('Status')
@@ -472,39 +453,15 @@ The package follows a modular trait-based architecture:
 
 ### Core Traits
 
-- **`HasColumns`** - Column management and rendering (120 lines)
-- **`HasFilters`** - Filter functionality and application (149 lines)
-- **`HasPagination`** - Pagination configuration (67 lines)
-- **`HasSorting`** - Sorting logic and state management (132 lines)
-- **`HasRowSelection`** - Row selection and bulk actions (142 lines)
-- **`HasRowActions`** - Individual row action handling (92 lines)
-- **`HasActions`** - Global header actions (59 lines)
+-   **`HasColumns`** - Column management and rendering (120 lines)
+-   **`HasFilters`** - Filter functionality and application (149 lines)
+-   **`HasPagination`** - Pagination configuration (67 lines)
+-   **`HasSorting`** - Sorting logic and state management (132 lines)
+-   **`HasRowSelection`** - Row selection and bulk actions (142 lines)
+-   **`HasRowActions`** - Individual row action handling (92 lines)
+-   **`HasActions`** - Global header actions (59 lines)
 
 Each trait is focused, testable, and can be understood independently.
-
-### Directory Structure
-
-```
-src/
-├── Actions/           # Action classes for global and row actions
-├── Columns/           # Column type classes with specialized features
-├── Commands/          # Artisan command for generating tables
-├── Concerns/          # Traits for modular functionality
-├── Filters/           # Filter classes for different data types
-├── Livewire/          # Main Table component
-└── LivewireDatatablesServiceProvider.php
-
-resources/
-├── stubs/             # Template for make:table command
-└── views/
-    ├── partials/      # Reusable view components
-    └── table.blade.php # Main table view
-
-tests/
-├── Feature/           # Integration tests
-├── Unit/              # Unit tests for each component
-└── Fixtures/          # Test data and models
-```
 
 ## 🧪 Testing
 
@@ -514,9 +471,6 @@ The package includes comprehensive tests using **Pest 3**:
 # Run all tests
 composer test
 
-# Run tests with coverage
-composer test:coverage
-
 # Run static analysis
 composer analyse
 
@@ -524,27 +478,16 @@ composer analyse
 composer format
 ```
 
-### Test Coverage
-
-- ✅ All traits individually tested
-- ✅ Column types and their features
-- ✅ Filter functionality and operators
-- ✅ Sorting mechanisms and edge cases
-- ✅ Pagination behavior
-- ✅ Row selection and bulk actions
-- ✅ Search functionality including relationships
-- ✅ Architecture rules with Pest Arch plugin
-
 ## 🔧 Development
 
 ### Code Quality Tools
 
 The package uses several tools to maintain high code quality:
 
-- **Pest 3** - Modern PHP testing framework
-- **Larastan** - Static analysis for Laravel
-- **Laravel Pint** - Code style fixer
-- **PHPStan** - Static analysis with strict rules
+-   **Pest 3** - Modern PHP testing framework
+-   **Larastan** - Static analysis for Laravel
+-   **Laravel Pint** - Code style fixer
+-   **PHPStan** - Static analysis with strict rules
 
 ### Contributing Workflow
 
@@ -560,12 +503,11 @@ The package uses several tools to maintain high code quality:
 
 See [CHANGELOG.md](CHANGELOG.md) for recent changes and version history.
 
-
 ## 👥 Credits
 
-- [Alex van Steenhoven](https://github.com/AlexVanSteenhoven) - Creator & Maintainer
-- [Modus Digital](https://github.com/modus-digital) - Organization
-- [All Contributors](../../contributors)
+-   [Alex van Steenhoven](https://github.com/AlexVanSteenhoven) - Creator & Maintainer
+-   [Modus Digital](https://github.com/modus-digital) - Organization
+-   [All Contributors](../../contributors)
 
 ## 📄 License
 
