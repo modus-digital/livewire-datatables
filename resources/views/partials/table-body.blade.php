@@ -21,7 +21,7 @@
                     'px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300',
                     'text-' . $column->getAlign()->value
                 ]) wire:key="cell-{{ $column->getField() }}-{{ $row->getKey() }}">
-                    <div @class(['max-w-0 truncate' => $column->getWidth()])>
+                    <div @class(['min-w-0 truncate' => $column->getWidth()])>
                         {!! $this->renderCell($column, $row) !!}
                     </div>
                 </td>
