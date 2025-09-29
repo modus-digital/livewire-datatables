@@ -1,5 +1,6 @@
 @if($this->getRecordActions($record)->isNotEmpty())
 @php($baseColor = \ModusDigital\LivewireDatatables\Support\Color::get()->value)
+
 <div x-data="{ actionsOpen: false }" class="relative inline-block text-right" x-cloak>
     {{-- Actions Button --}}
     <button @click.stop="actionsOpen = !actionsOpen"
@@ -18,7 +19,7 @@
         class="absolute right-0 z-10 mt-2 w-48 bg-white rounded-md shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div class="py-1">
             @foreach($this->getRecordActions($record) as $action)
-                <button wire:click.stop="executeRowAction('{{ $action->getKey() }}', {{ $record->id }})"
+                <button wire:click.stop="executeRowAction('{{ $action->getKey() }}', @js($record->id))"
                     @if($action->getConfirmMessage()) onclick="return confirm('{{ $action->getConfirmMessage() }}')" @endif
                     class="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {{ $action->getClass() ?: 'text-gray-700 dark:text-gray-300' }}">
                     @if($action->getIcon())

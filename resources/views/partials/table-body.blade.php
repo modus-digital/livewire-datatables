@@ -4,15 +4,14 @@
     @forelse($rows as $row)
         <tr @class([
             'hover:bg-gray-50 dark:hover:bg-gray-700 py-4',
-            $colors['background'] => $this->hasSelection() && $this->isSelected($row->id),
+            $colors['background'] => $this->hasSelection() && $this->isSelected($row->getKey()),
             'cursor-pointer' => $this->hasShowRecord()
-        ]) wire:key="row-{{ $row->id }}"
-            @if($this->hasShowRecord())
-            wire:click="showRecord({{ is_string($row->id) ? '\'' . $row->id . '\'' : $row->id }})" @endif>
+        ]) wire:key="row-{{ $row->getKey() }}" @if($this->hasShowRecord()) wire:click="showRecord(@js($row->getKey()))"
+        @endif>
             @if($this->hasSelection())
                 <td class="relative px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    <input type="checkbox" wire:click.stop="toggleSelection({{ $row->id }})"
-                        @checked($this->isSelected($row->id))
+                    <input type="checkbox" wire:click.stop="toggleSelection(@js($row->getKey()))"
+                        @checked($this->isSelected($row->getKey()))
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded {{ 'focus:ring-' . $baseColor . '-500' }} dark:{{ 'focus:ring-' . $baseColor . '-600' }} dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                 </td>
             @endif
@@ -21,7 +20,7 @@
                 <td @class([
                     'px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300',
                     'text-' . $column->getAlign()->value
-                ]) wire:key="cell-{{ $column->getField() }}-{{ $row->id }}">
+                ]) wire:key="cell-{{ $column->getField() }}-{{ $row->getKey() }}">
                     <div @class(['max-w-0 truncate' => $column->getWidth()])>
                         {!! $this->renderCell($column, $row) !!}
                     </div>

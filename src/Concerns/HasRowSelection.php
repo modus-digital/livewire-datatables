@@ -128,13 +128,13 @@ trait HasRowSelection
         // Handle Collection type
         if (method_exists($rows, 'pluck') && ! method_exists($rows, 'items')) {
             /** @var \Illuminate\Support\Collection<int, \Illuminate\Database\Eloquent\Model> $rows */
-            return $rows->pluck('id')->toArray();
+            return $rows->map->getKey()->toArray();
         }
 
         // Handle LengthAwarePaginator type
         if (method_exists($rows, 'items')) {
             /** @var \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, \Illuminate\Database\Eloquent\Model> $rows */
-            return collect($rows->items())->pluck('id')->toArray();
+            return collect($rows->items())->map->getKey()->toArray();
         }
 
         return [];
