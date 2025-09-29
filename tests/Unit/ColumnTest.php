@@ -4,8 +4,16 @@ declare(strict_types=1);
 
 use ModusDigital\LivewireDatatables\Columns\Column;
 
-enum Suit: string { case Hearts = 'H'; case Spades = 'S'; }
-enum Status { case Active; case Inactive; }
+enum Suit: string
+{
+    case Hearts = 'H';
+    case Spades = 'S';
+}
+enum Status
+{
+    case Active;
+    case Inactive;
+}
 
 it('constructor label/field gedrag zonder label', function () {
     $column = new Column('full_name');

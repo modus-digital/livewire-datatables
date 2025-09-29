@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use ModusDigital\LivewireDatatables\Filters\DateFilter;
 use ModusDigital\LivewireDatatables\Filters\SelectFilter;
 use ModusDigital\LivewireDatatables\Filters\TextFilter;
@@ -51,7 +50,7 @@ class DummyHasFiltersTable extends Table
 }
 
 it('applyFilters slaat lege waarden over en gebruikt data_get voor dot notatie', function () {
-    $table = new DummyHasFiltersTable();
+    $table = new DummyHasFiltersTable;
 
     // stel filters state met dot notation
     $table->filters = [
@@ -71,7 +70,7 @@ it('applyFilters slaat lege waarden over en gebruikt data_get voor dot notatie',
 });
 
 it('requiresAttributeFiltering true wanneer attribute-modus triggert', function () {
-    $table = new DummyHasFiltersTable();
+    $table = new DummyHasFiltersTable;
     $table->filters = [
         'display_name' => 'Jane', // direct attribute -> triggert
     ];
@@ -80,7 +79,7 @@ it('requiresAttributeFiltering true wanneer attribute-modus triggert', function 
 });
 
 it('getActiveAttributeFilters bevat volledige details', function () {
-    $table = new DummyHasFiltersTable();
+    $table = new DummyHasFiltersTable;
     $table->filters = [
         'display_name' => 'Jane',
         'company' => ['slug' => 'acme'],
@@ -99,7 +98,7 @@ it('getActiveAttributeFilters bevat volledige details', function () {
 });
 
 it('resetFilters en resetFilter resetten state en dispatchen events', function () {
-    $table = new DummyHasFiltersTable();
+    $table = new DummyHasFiltersTable;
     $table->filters = ['status' => 'active', 'company' => ['slug' => 'acme']];
 
     // Livewire\Component::dispatch returnt $this; we checken niet de dispatcher maar state effecten

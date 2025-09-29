@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use ModusDigital\LivewireDatatables\Columns\Column;
 use ModusDigital\LivewireDatatables\Filters\DateFilter;
@@ -31,6 +29,7 @@ class ITUser extends \Illuminate\Database\Eloquent\Model
 class ITAccount extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'accounts';
+
     protected $guarded = [];
 
     public function getSlugAttribute(): string
@@ -135,7 +134,7 @@ it('applySearchToRelationship attribute vs gewone relatie', function () {
 });
 
 it('matchesAttributeFilter operators en matchesDateAttributeFilter single/range', function () {
-    $table = new ITTable();
+    $table = new ITTable;
 
     $r = collect([
         new ITUser(['first_name' => 'Alpha', 'created_at' => '2023-01-05']),

@@ -51,7 +51,7 @@ beforeEach(function () {
 });
 
 it('getColumns cache en hidden filtering', function () {
-    $table = new DummyHasColumnsTable();
+    $table = new DummyHasColumnsTable;
 
     $first = $table->getColumns();
     $second = $table->getColumns();
@@ -62,7 +62,7 @@ it('getColumns cache en hidden filtering', function () {
 });
 
 it('getColumn vindt kolommen ook bij relatie/dot notatie', function () {
-    $table = new DummyHasColumnsTable();
+    $table = new DummyHasColumnsTable;
 
     expect($table->getColumn('first_name'))->not->toBeNull()
         ->and($table->getColumn('account.label'))->not->toBeNull()
@@ -70,7 +70,7 @@ it('getColumn vindt kolommen ook bij relatie/dot notatie', function () {
 });
 
 it('isFieldAttribute detectie en cache (direct en relatie)', function () {
-    $table = new DummyHasColumnsTable();
+    $table = new DummyHasColumnsTable;
 
     // direct accessor op DummyUserModel
     expect($table->isFieldAttribute('full_name'))->toBeTrue();
@@ -86,8 +86,8 @@ it('isFieldAttribute detectie en cache (direct en relatie)', function () {
 });
 
 it('renderCell gebruikt view als set', function () {
-    $table = new DummyHasColumnsTable();
-    $record = new DummyUserModel();
+    $table = new DummyHasColumnsTable;
+    $record = new DummyUserModel;
     $record->first_name = 'Jane';
     $column = Column::make('first_name')->view('tests::stub-cell');
 
