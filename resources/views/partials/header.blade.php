@@ -1,4 +1,4 @@
-<div class="flex items-center justify-between gap-4 space-y-4">
+<div class="flex items-center justify-between gap-4 px-6 py-4">
     @php($colors = \ModusDigital\LivewireDatatables\Support\Color::getColorMap())
     @php($baseColor = \ModusDigital\LivewireDatatables\Support\Color::get()->value)
     @php($defaultButtonClasses = 'bg-' . $baseColor . '-600 hover:bg-' . $baseColor . '-700 text-white')
@@ -6,7 +6,7 @@
 
         @if($this->isSearchable())
             <input type="text" wire:model.live.debounce.300ms="search" placeholder="{{ $this->getSearchPlaceholder() }}"
-                class="ml-4 my-4 w-md bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg {{ $colors['ring'] }} block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                class="w-md bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg {{ $colors['ring'] }} block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
 
             @if($search)
                 <button wire:click="clearSearch"
