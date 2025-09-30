@@ -22,7 +22,7 @@
                     'text-' . $column->getAlign()->value
                 ]) wire:key="cell-{{ $column->getField() }}-{{ $row->getKey() }}"
                     @if($column->getWidth()) style="width: {{ $column->getWidth() }}" @endif>
-                    <div @class(['min-w-0 truncate' => $column->getWidth()]) @if($column->getWidth())
+                    <div @class(['truncate' => $column->getWidth()]) @if($column->getWidth())
                     style="max-width: {{ $column->getWidth() }}" @endif>
                         {!! $this->renderCell($column, $row) !!}
                     </div>
